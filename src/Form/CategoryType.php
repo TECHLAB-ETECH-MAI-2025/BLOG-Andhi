@@ -4,6 +4,8 @@ namespace App\Form;
 
 use App\Entity\Category;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -13,19 +15,25 @@ class CategoryType extends AbstractType
     {
         $builder
             ->add('title', TextType::class, [
-                'label' => 'Titre de l\'article',
+                'label' => 'Titre de la catégorie',
+                'label_attr' => [
+                    'class' => 'font-bold'
+                ],
                 'attr' => [
-                    'class' => '',
-                    'placeholder' => 'Entrez un titre pour votre article',
+                    'class' => 'block w-full border border-neutral-500 rounded-sm p-1 mb-2',
+                    'placeholder' => 'Entrez un nom de catégorie',
                     'required' => true
                 ]
             ])
             ->add('description', TextareaType::class, [
-                'label' => 'Votre commentaire',
+                'label' => 'Description',
+                'label_attr' => [
+                    'class' => 'font-bold'
+                ],
                 'attr' => [
-                    'class' => '',
+                    'class' => 'block w-full border border-neutral-500 rounded-sm p-1',
                     'rows' => 4,
-                    'placeholder' => 'Écrivez votre commentaire ici...',
+                    'placeholder' => 'Écrivez la description de cette catégorie ici...',
                     'required' => true
                 ]
             ]);
