@@ -1,11 +1,56 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Category index{% endblock %}
+{% block title %}Catégories - Mon Blog{% endblock %}
 
 {% block body %}
-    <h1>Category index</h1>
 
-    <table class="table">
+    <div class="flex items-center justify-between mb-2">
+        <h1 class="font-bold text-2xl">Liste des catégories</h1>
+        <a href="{{ path('app_category_new') }}" class="block bg-neutral-50 border-1 border-red-400 text-red-400 rounded-sm px-4 py-1 transition-all delay-50 hover:bg-red-400 hover:text-red-50">
+            <span>Créez une catégorie</span>
+        </a>
+    </div>
+
+    {% set descriptionLength = 40 %}
+
+    {% for category in categories %}
+        {% set today = category.createdAt|date("Y-m-d") == "now"|date("Y-m-d") %}
+        {% set yesterday = category.createdAt|date("Y-m-d") == ("-1 day"|date("Y-m-d")) %}
+        <a href="{{ path('app_category_show', {'id': category.id}) }}" class="block border-neutral-200 rounded-xl px-4 py-2 transition-all delay-50 hover:bg-neutral-100">
+            <div class="flex items-center justify-between">
+                <h2 class="text-xl font-bold text-red-400">{{ category.title }}</h2>
+                <div class="text-sm">
+                    <i>
+                        {% if today %}
+                            {{ category.createdAt|date("H:i") }}
+                        {% elseif yesterday %}
+                            Hier
+                        {% else %}
+                            {{ category.createdAt|date("d M") }}
+                        {% endif %}
+                    </i>
+                </div>
+            </div>
+            <p>
+                {{ category.description|length >= descriptionLength ? category.description|slice(0, descriptionLength - 3) ~ '...' : category.description }}
+            </p>
+        </a>
+        {% if not loop.last %}
+            <hr class="border-neutral-300 mx-4">
+        {% endif %}
+        {% else %}
+            <div class="justify-items-center p-8">
+                <h3 class="text-center">
+                    Pas de catégorie
+                </h3>
+                <a href="{{ path('app_article_new') }}" class="block bg-neutral-50 border-1 border-red-400 text-red-400 rounded-sm px-4 py-1 mt-2 hover:bg-red-400 hover:text-red-50">
+                    <span>Créez une catégorie</span>
+                </a>
+            </div>
+    {% endfor %}
+    
+
+    {# <table class="table">
         <thead>
             <tr>
                 <th>Id</th>
@@ -31,7 +76,7 @@
             </tr>
         {% endfor %}
         </tbody>
-    </table>
+    </table> #}
 
-    <a href="{{ path('app_category_new') }}">Create new</a>
+    {# <a href="{{ path('app_category_new') }}">Create new</a> #}
 {% endblock %}

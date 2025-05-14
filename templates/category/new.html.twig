@@ -3,9 +3,12 @@
 {% block title %}New Category{% endblock %}
 
 {% block body %}
-    <h1>Create new Category</h1>
+    <div class="flex items-center gap-4 mb-2">
+        <a href="{{ path('app_category_index') }}" class="w-8 h-8 min-w-8 flex items-center justify-center border-1 border-neutral-400 rounded-xl text-md pb-0.5">
+            <span>{{ '<' }}</span>
+        </a>
+        <h1 class="font-bold text-2xl">Création d'une catégorie</h1>
+    </div>
 
     {{ include('category/_form.html.twig') }}
-
-    <a href="{{ path('app_category_index') }}">back to list</a>
 {% endblock %}

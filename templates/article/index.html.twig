@@ -3,9 +3,34 @@
 {% block title %}Article index{% endblock %}
 
 {% block body %}
-    <h1>Article index</h1>
+<div>
+    {% for article in articles %}
+        <div class="grid gap-2">
+            <div class="shadow-md p-2">
+                <h2 class="text-xl font-bold">{{ article.title }}</h2>
+                <p>{{ article.content }}</p>
+                <div class="flex items-center justify-between">
+                    <div>
+                        <span class="">{{ article.createdAt ? article.createdAt|date('Y-m-d H:i:s') : ''  }}</span>
+                    </div>
+                    <div>
+                        <span class="">{{ article.createdAt ? article.createdAt|date('Y-m-d H:i:s') : ''  }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+            <div class="justify-items-center p-8">
+                <h3 class="text-center">
+                    Pas d'article pour le moment
+                </h3>
+                <a href="{{ path('app_article_new') }}" class="block bg-neutral-50 border-1 border-red-400 text-red-400 rounded-sm px-4 py-1 mt-2 transition-all delay-50 hover:bg-red-400 hover:text-red-50">
+                    <span>Créez un article</span>
+                </a>
+            </div>
+    {% endfor %}
 
-    <table class="table">
+    {# <table class="table">
         <thead>
             <tr>
                 <th>Id</th>
@@ -33,7 +58,8 @@
             </tr>
         {% endfor %}
         </tbody>
-    </table>
+    </table> #}
 
-    <a href="{{ path('app_article_new') }}">Create new</a>
+    {# <a href="{{ path('app_article_new') }}">Create new</a> #}
+</div>
 {% endblock %}
