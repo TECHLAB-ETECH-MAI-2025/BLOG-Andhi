@@ -18,16 +18,22 @@ class ArticleType extends AbstractType
         $builder
             ->add('title', TextType::class, [
                 'label' => 'Titre de l\'article',
+                'label_attr' => [
+                    'class' => 'font-bold'
+                ],
                 'attr' => [
-                    'class' => '',
-                    'placeholder' => 'Entrez un titre pour votre article',
+                    'class' => 'block w-full border border-neutral-200 rounded-sm p-2 mb-2',
+                    'placeholder' => 'Entrez le titre de l\'article',
                     'required' => true
                 ]
             ])
             ->add('content', TextareaType::class, [
                 'label' => 'Contenu de l\'article',
+                'label_attr' => [
+                    'class' => 'font-bold'
+                ],
                 'attr' => [
-                    'class' => '',
+                    'class' => 'block w-full border border-neutral-200 rounded-sm p-2 mb-2',
                     'rows' => 10,
                     'placeholder' => 'Écrivez le contenu de votre article ici...',
                     'required' => true
@@ -39,11 +45,11 @@ class ArticleType extends AbstractType
                 'multiple' => true,
                 'expanded' => true,
                 'label' => 'Catégories',
-                'attr' => [
-                    'class' => '',
-                ],
                 'label_attr' => [
-                    'class' => 'f'
+                    'class' => 'font-bold'
+                ],
+                'attr' => [
+                    'class' => 'flex flex-wrap gap-2'
                 ]
             ]);
         ;

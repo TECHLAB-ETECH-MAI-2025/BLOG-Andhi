@@ -3,30 +3,31 @@
 {% block title %}Article{% endblock %}
 
 {% block body %}
-    <h1>Article</h1>
 
-    
+    <div class="flex items-center gap-4">
+        <a href="{{ path('app_article_index') }}" class="w-8 h-8 min-w-8 flex items-center justify-center border-1 border-neutral-400 rounded-4xl text-lg pb-0.5">
+            <span>{{ '<' }}</span>
+        </a>
+        <h1 class="font-normal text-4xl">{{ article.title }}</h1>
+    </div>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ article.id }}</td>
-            </tr>
-            <tr>
-                <th>Title</th>
-                <td>{{ article.title }}</td>
-            </tr>
-            <tr>
-                <th>Content</th>
-                <td>{{ article.content }}</td>
-            </tr>
-            <tr>
-                <th>CreatedAt</th>
-                <td>{{ article.createdAt ? article.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="text-neutral-400 my-4 ml-12">
+        <span><i>Publié le</i> : {{ article.createdAt|date('d/m/Y H:i') }}</span>
+    </div>
+
+    <div class="flex flex-wrap gap-2 my-4 ml-12">
+        {% for category in article.categories %}
+            <div class="text-red-400 border-1 border-red-400 rounded-md px-2">
+                <span>{{ category.title }}</span>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="mt-10">
+        <p class="leading-loose indent-8">
+            {{ article.content }}
+        </p>
+    </div>
 
     <a href="{{ path('app_article_index') }}">back to list</a>
 

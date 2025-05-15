@@ -1,64 +1,75 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Article index{% endblock %}
+{% block title %}Articles - Mon Blog{% endblock %}
 
 {% block body %}
-<div>
-    {% for article in articles %}
-        <div class="grid gap-2">
-            <div class="shadow-md p-2">
-                <h2 class="text-xl font-bold">{{ article.title }}</h2>
-                <p>{{ article.content }}</p>
-                <div class="flex items-center justify-between">
-                    <div>
-                        <span class="">{{ article.createdAt ? article.createdAt|date('Y-m-d H:i:s') : ''  }}</span>
+<div class="w-full flex gap-2">
+
+    <div class="w-1/4 border-r-1 border-neutral-300 pr-8">
+        <a href="{{ path('app_category_index') }}" class="block text-red-400 font-bold text-center text-lg">
+            <u>Tous les catégories</u>
+        </h4>
+        <div class="mt-2">
+            {% for category in categories %}
+                <a href="{{ path('app_category_show', {'id': category.id}) }}">
+                    <div class="border-neutral-200 rounded-lg px-4 py-2 transition delay-50 hover:bg-neutral-100 hover:translate-x-1">
+                        <span>{{ category.title }}</span>
                     </div>
-                    <div>
-                        <span class="">{{ article.createdAt ? article.createdAt|date('Y-m-d H:i:s') : ''  }}</span>
-                    </div>
-                </div>
-            </div>
+                </a>
+            {% endfor %}
         </div>
-        {% else %}
-            <div class="justify-items-center p-8">
-                <h3 class="text-center">
-                    Pas d'article pour le moment
-                </h3>
+    </div>
+    <div class="w-3/4 pl-8">
+        <div class="flex items-center justify-between mb-4">
+            <h1 class="font-normal text-4xl">Articles</h1>
+            {% if articles|length > 0 %}
                 <a href="{{ path('app_article_new') }}" class="block bg-neutral-50 border-1 border-red-400 text-red-400 rounded-sm px-4 py-1 mt-2 transition-all delay-50 hover:bg-red-400 hover:text-red-50">
                     <span>Créez un article</span>
                 </a>
-            </div>
-    {% endfor %}
-
-    {# <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Title</th>
-                <th>Content</th>
-                <th>CreatedAt</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for article in articles %}
-            <tr>
-                <td>{{ article.id }}</td>
-                <td>{{ article.title }}</td>
-                <td>{{ article.content }}</td>
-                <td>{{ article.createdAt ? article.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-                <td>
-                    <a href="{{ path('app_article_show', {'id': article.id}) }}">show</a>
-                    <a href="{{ path('app_article_edit', {'id': article.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="5">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table> #}
+            {% endif %}
+        </div>
+        <div class="grid gap-2">
+            {% if articles|length > 0 %}
+                {% for article in articles %}
+                    {% set today = article.createdAt|date("Y-m-d") == "now"|date("Y-m-d") %}
+                    {% set yesterday = article.createdAt|date("Y-m-d") == ("-1 day"|date("Y-m-d")) %}
+                    <a href="{{ path('app_article_show', {id: article.id}) }}">
+                        <div class="bg-red-50/0 rounded-md shadow-sm p-8 transition-all delay-25 hover:bg-red-50/50">
+                            <div>
+                                {% if today %}
+                                    Publié le : <i>{{ article.createdAt|date("H:i") }}</i>
+                                {% elseif yesterday %}
+                                    Publié : <i>Hier</i>
+                                {% else %}
+                                    Publié le : <i>{{ article.createdAt|date("d M") }}</i>
+                                {% endif %}
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <h2 class="text-xl font-bold text-wrap">{{ article.title }}</h2>
+                            </div>
+                            <p>{{ article.content|length > 100 ? article.content|slice(0, 97) ~ '...' : article.content }}</p>
+                            <div class="flex flex-wrap gap-2 mt-5">
+                                {% for category in article.categories %}
+                                    <div class="text-red-400 border-1 border-red-400 rounded-md px-2">
+                                        <span>{{ category.title }}</span>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </a>
+                {% endfor %}
+            {% else %}
+                <div class="justify-items-center p-8">
+                    <h3 class="font-normal text-center">
+                        Pas d'article pour le moment
+                    </h3>
+                    <a href="{{ path('app_article_new') }}" class="block bg-neutral-50 border-1 border-red-400 text-red-400 rounded-sm px-4 py-1 mt-2 transition-all delay-50 hover:bg-red-400 hover:text-red-50">
+                        <span>Créez un article</span>
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
 
     {# <a href="{{ path('app_article_new') }}">Create new</a> #}
 </div>
