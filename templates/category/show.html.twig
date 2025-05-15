@@ -3,28 +3,32 @@
 {% block title %}Category{% endblock %}
 
 {% block body %}
-    <h1>Category</h1>
+    <div class="flex items-center gap-4 mb-4">
+        <a href="{{ path('app_category_index') }}" class="w-8 h-8 min-w-8 flex items-center justify-center border-1 border-neutral-400 rounded-4xl text-lg pb-0.5">
+            <span>{{ '<' }}</span>
+        </a>
+        <h1 class="font-normal text-4xl">Détail de catégorie</h1>
+    </div>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ category.id }}</td>
-            </tr>
-            <tr>
-                <th>Title</th>
-                <td>{{ category.title }}</td>
-            </tr>
-            <tr>
-                <th>Description</th>
-                <td>{{ category.description }}</td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="grid grid-cols-2">
+        <div class="my-2">
+            <strong><u>Nom de la catégorie</u></strong>: {{ category.title }}
+        </div>
+        <div class="my-2">
+            <strong><u>Crée le</u></strong>: {{ category.createdAt|date("d/m/Y H:i") }}
+        </div>
+        <div class="my-2">
+            <strong><u>Description</u>: </strong>
+            <p>
+                {{ category.description }}
+            </p>
+        </div>
+    </div>
 
-    <a href="{{ path('app_category_index') }}">back to list</a>
+    <div class="flex gap-2 mt-4">
+        <a href="{{ path('app_category_edit', {'id': category.id}) }}" class="bg-red-400 border-1 text-neutral-50 rounded-md px-4 py-1 mt-2 transition-all delay-50 cursor-pointer hover:bg-neutral-50 hover:text-red-400">Modifier</a>
+        {{ include('category/_delete_form.html.twig') }}
+    </div>
 
-    <a href="{{ path('app_category_edit', {'id': category.id}) }}">edit</a>
 
-    {{ include('category/_delete_form.html.twig') }}
 {% endblock %}

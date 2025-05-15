@@ -4,9 +4,9 @@
 
 {% block body %}
 
-    <div class="flex items-center justify-between mb-2">
-        <h1 class="font-bold text-2xl">Liste des catégories</h1>
-        <a href="{{ path('app_category_new') }}" class="block bg-neutral-50 border-1 border-red-400 text-red-400 rounded-sm px-4 py-1 transition-all delay-50 hover:bg-red-400 hover:text-red-50">
+    <div class="flex items-center justify-between mb-4">
+        <h1 class="font-normal text-4xl">Liste des catégories</h1>
+        <a href="{{ path('app_category_new') }}" class="block bg-neutral-50 border-1 border-red-400 text-red-400 rounded-md px-4 py-1 transition-all delay-50 hover:bg-red-400 hover:text-red-50">
             <span>Créez une catégorie</span>
         </a>
     </div>
@@ -16,7 +16,7 @@
     {% for category in categories %}
         {% set today = category.createdAt|date("Y-m-d") == "now"|date("Y-m-d") %}
         {% set yesterday = category.createdAt|date("Y-m-d") == ("-1 day"|date("Y-m-d")) %}
-        <a href="{{ path('app_category_show', {'id': category.id}) }}" class="block border-neutral-200 rounded-xl px-4 py-2 transition-all delay-50 hover:bg-neutral-100">
+        <a href="{{ path('app_category_show', {'id': category.id}) }}" class="block border-neutral-200 rounded-lg px-4 py-2 transition-all delay-50 hover:bg-neutral-100">
             <div class="flex items-center justify-between">
                 <h2 class="text-xl font-bold text-red-400">{{ category.title }}</h2>
                 <div class="text-sm">

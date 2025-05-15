@@ -20,7 +20,7 @@ class CategoryType extends AbstractType
                     'class' => 'font-bold'
                 ],
                 'attr' => [
-                    'class' => 'block w-full border border-neutral-500 rounded-sm p-1 mb-2',
+                    'class' => 'block w-full border border-neutral-100 rounded-sm p-2 mb-2',
                     'placeholder' => 'Entrez un nom de catégorie',
                     'required' => true
                 ]
@@ -31,8 +31,8 @@ class CategoryType extends AbstractType
                     'class' => 'font-bold'
                 ],
                 'attr' => [
-                    'class' => 'block w-full border border-neutral-500 rounded-sm p-1',
-                    'rows' => 4,
+                    'class' => 'block w-full border border-neutral-100 rounded-sm p-2',
+                    'rows' => 3,
                     'placeholder' => 'Écrivez la description de cette catégorie ici...',
                     'required' => true
                 ]

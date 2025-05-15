@@ -3,11 +3,17 @@
 {% block title %}Edit Category{% endblock %}
 
 {% block body %}
-    <h1>Edit Category</h1>
+    <div class="flex items-center gap-4 mb-4">
+        <a href="{{ path('app_category_index') }}" class="w-8 h-8 min-w-8 flex items-center justify-center border-1 border-neutral-400 rounded-4xl text-lg pb-0.5">
+            <span>{{ '<' }}</span>
+        </a>
+        <h1 class="font-normal text-4xl">Modification de catégorie</h1>
+    </div>
 
-    {{ include('category/_form.html.twig', {'button_label': 'Update'}) }}
+    {{ include('category/_form.html.twig') }}
 
-    <a href="{{ path('app_category_index') }}">back to list</a>
-
+    <div class="flex gap-2">
     {{ include('category/_delete_form.html.twig') }}
+    </div>
+    
 {% endblock %}
