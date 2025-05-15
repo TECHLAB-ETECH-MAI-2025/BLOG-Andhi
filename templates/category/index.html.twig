@@ -5,7 +5,12 @@
 {% block body %}
 
     <div class="flex items-center justify-between mb-4">
-        <h1 class="font-normal text-4xl">Liste des catégories</h1>
+        <div class="flex items-center gap-4">
+            <a href="{{ path('app_article_index') }}" class="w-8 h-8 min-w-8 flex items-center justify-center border-1 border-neutral-400 rounded-4xl text-lg pb-0.5">
+                <span>{{ '<' }}</span>
+            </a>
+            <h1 class="font-normal text-4xl">Tous les catégories</h1>
+        </div>
         <a href="{{ path('app_category_new') }}" class="block bg-neutral-50 border-1 border-red-400 text-red-400 rounded-md px-4 py-1 transition-all delay-50 hover:bg-red-400 hover:text-red-50">
             <span>Créez une catégorie</span>
         </a>
@@ -43,40 +48,10 @@
                 <h3 class="text-center">
                     Pas de catégorie
                 </h3>
-                <a href="{{ path('app_article_new') }}" class="block bg-neutral-50 border-1 border-red-400 text-red-400 rounded-sm px-4 py-1 mt-2 hover:bg-red-400 hover:text-red-50">
+                <a href="{{ path('app_category_new') }}" class="block bg-neutral-50 border-1 border-red-400 text-red-400 rounded-sm px-4 py-1 mt-2 hover:bg-red-400 hover:text-red-50">
                     <span>Créez une catégorie</span>
                 </a>
             </div>
     {% endfor %}
     
-
-    {# <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Title</th>
-                <th>Description</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for category in categories %}
-            <tr>
-                <td>{{ category.id }}</td>
-                <td>{{ category.title }}</td>
-                <td>{{ category.description }}</td>
-                <td>
-                    <a href="{{ path('app_category_show', {'id': category.id}) }}">show</a>
-                    <a href="{{ path('app_category_edit', {'id': category.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="4">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table> #}
-
-    {# <a href="{{ path('app_category_new') }}">Create new</a> #}
 {% endblock %}
