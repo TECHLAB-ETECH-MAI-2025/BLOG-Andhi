@@ -21,20 +21,29 @@ class ArticleRepository extends ServiceEntityRepository
         parent::__construct($registry, Article::class);
     }
 
-//    /**
-//     * @return Article[] Returns an array of Article objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('a')
-//            ->andWhere('a.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('a.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+   /**
+    * @return [] Returns an array of Article objects
+    */
+   public function getArticlesPerPage($page, $size): array
+   {
+        $articles = $this->createQueryBuilder('a')
+           ->orderBy('a.id', 'DESC')
+           ->setFirstResult(($page - 1) * $size)
+           ->setMaxResults($size)
+           ->getQuery()
+           ->getResult();
+
+        $countData = $this->createQueryBuilder('a')
+        ->select('COUNT(a.id)');
+
+        $totalResults = (int) $countData->getQuery()->getSingleScalarResult();
+        $totalPages = (int) ceil($totalResults / $size);
+
+       return [
+            'articles' => $articles,
+            'totalPages' => $totalPages
+       ];
+   }
 
 //    public function findOneBySomeField($value): ?Article
 //    {

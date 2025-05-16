@@ -3,6 +3,7 @@
 {% block title %}Articles - Mon Blog{% endblock %}
 
 {% block body %}
+
 <div class="w-full flex gap-2">
 
     <div class="w-1/4 border-r-1 border-neutral-300 pr-8">
@@ -35,13 +36,13 @@
                     {% set yesterday = article.createdAt|date("Y-m-d") == ("-1 day"|date("Y-m-d")) %}
                     <a href="{{ path('app_article_show', {id: article.id}) }}">
                         <div class="bg-red-50/0 rounded-md shadow-sm p-8 transition-all delay-25 hover:bg-red-50/50">
-                            <div>
+                            <div class="text-neutral-400">
                                 {% if today %}
-                                    Publié le : <i>{{ article.createdAt|date("H:i") }}</i>
+                                    <i>Publié le </i>: <span>{{ article.createdAt|date("H:i") }}</span>
                                 {% elseif yesterday %}
-                                    Publié : <i>Hier</i>
+                                    <i>Publié </i>: <span>Hier</span>
                                 {% else %}
-                                    Publié le : <i>{{ article.createdAt|date("d M") }}</i>
+                                    <i>Publié le </i>: <span>{{ article.createdAt|date("d M") }}</span>
                                 {% endif %}
                             </div>
                             <div class="flex items-center justify-between">
@@ -58,6 +59,15 @@
                         </div>
                     </a>
                 {% endfor %}
+
+                <div class="flex items-center justify-end text-md mt-4">
+                    <a href="{{ path('app_article_index', {'page': ((currentPage > 1) ? (currentPage - 1) : currentPage) }) }}" class="border-1 border-red-400 rounded-l-md px-2 py-1"><span>Précédent</span></a>
+                    {% for i in 1 .. totalPages %}
+                        <a href="{{ path('app_article_index', {'page': ((currentPage > 1) ? (currentPage - 1) : currentPage) }) }}" class="border-1 border-red-400 px-2 py-1 {{ currentPage == i ? 'text-neutral-200' : '' }}"><span>{{ i }}</span></a>
+                    {% endfor %}
+                    <a href="{{ path('app_article_index', {'page': (currentPage + 1) }) }}" class="border-1 border-red-400 rounded-r-md px-2 py-1"><span>Suivant</span></a>
+                </div>
+
             {% else %}
                 <div class="justify-items-center p-8">
                     <h3 class="font-normal text-center">
@@ -71,6 +81,5 @@
         </div>
     </div>
 
-    {# <a href="{{ path('app_article_new') }}">Create new</a> #}
 </div>
 {% endblock %}

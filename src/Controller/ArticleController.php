@@ -14,19 +14,27 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route('/article')]
 class ArticleController extends AbstractController
+
 {
     #[Route('/', name: 'app_article_index', methods: ['GET'])]
-    public function index(ArticleRepository $articleRepository, CategoryRepository $categoryRepository): Response
+    public function index(Request $request, ArticleRepository $articleRepository, CategoryRepository $categoryRepository): Response
     {
+        $page = $request->query->getInt("page", 1);
+        $size = 4;
+        $data = $articleRepository->getArticlesPerPage($page, $size);
+        $articles = $data['articles'];
+        $totalPages = $data['totalPages'];
+
         return $this->render('article/index.html.twig', [
-            'articles' => $articleRepository->findAll(),
+            'articles' => $articles,
+            'currentPage' => $page,
+            'totalPages' => $totalPages,
             'categories' => $categoryRepository->findAll()
         ]);
     }
 
-    #[Route('/new', name: 'app_article_new', methods: ['GET', 'POST'])]
+    #[Route('/article/new', name: 'app_article_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $article = new Article();
@@ -47,7 +55,7 @@ class ArticleController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_article_show', methods: ['GET'])]
+    #[Route('/article/{id}', name: 'app_article_show', methods: ['GET', 'POST'])]
     public function show(Article $article, Request $request, EntityManagerInterface $entityManager): Response
     {
         $comment = new Comment();
@@ -77,7 +85,7 @@ class ArticleController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_article_edit', methods: ['GET', 'POST'])]
+    #[Route('/article/{id}/edit', name: 'app_article_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Article $article, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(ArticleType::class, $article);
@@ -95,7 +103,7 @@ class ArticleController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_article_delete', methods: ['POST'])]
+    #[Route('/article/{id}', name: 'app_article_delete', methods: ['POST'])]
     public function delete(Request $request, Article $article, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$article->getId(), $request->request->get('_token'))) {
