@@ -6,64 +6,29 @@
 
 <div class="w-full flex gap-2">
 
-    <div class="w-1/4 border-r-1 border-neutral-300 pr-8">
-        <a href="{{ path('app_category_index') }}" class="block text-red-400 font-bold text-center text-lg">
-            <u>Tous les catégories</u>
-        </h4>
-        <div class="mt-2">
-            {% for category in categories %}
-                <a href="{{ path('app_category_show', {'id': category.id}) }}">
-                    <div class="border-neutral-200 rounded-lg px-4 py-2 transition delay-50 hover:bg-neutral-100 hover:translate-x-1">
-                        <span>{{ category.title }}</span>
-                    </div>
-                </a>
-            {% endfor %}
-        </div>
-    </div>
-    <div class="w-3/4 pl-8">
+    <div class="w-4/5 pr-8">
         <div class="flex items-center justify-between mb-4">
             <h1 class="font-normal text-4xl">Articles</h1>
             {% if articles|length > 0 %}
-                <a href="{{ path('app_article_new') }}" class="block bg-neutral-50 border-1 border-red-400 text-red-400 rounded-sm px-4 py-1 mt-2 transition-all delay-50 hover:bg-red-400 hover:text-red-50">
-                    <span>Créez un article</span>
+                <a href="{{ path('app_article_new') }}">
+                    {{ include('components/buttons/_button_outline.html.twig', {'button_label' : 'Créez un article'} ) }}
                 </a>
             {% endif %}
         </div>
-        <div class="grid gap-2">
+        <div class="grid gap-4 mt-8">
             {% if articles|length > 0 %}
                 {% for article in articles %}
                     {% set today = article.createdAt|date("Y-m-d") == "now"|date("Y-m-d") %}
                     {% set yesterday = article.createdAt|date("Y-m-d") == ("-1 day"|date("Y-m-d")) %}
                     <a href="{{ path('app_article_show', {id: article.id}) }}">
-                        <div class="bg-red-50/0 rounded-md shadow-sm p-8 transition-all delay-25 hover:bg-red-50/50">
-                            <div class="text-neutral-400">
-                                {% if today %}
-                                    <i>Publié le </i>: <span>{{ article.createdAt|date("H:i") }}</span>
-                                {% elseif yesterday %}
-                                    <i>Publié </i>: <span>Hier</span>
-                                {% else %}
-                                    <i>Publié le </i>: <span>{{ article.createdAt|date("d M") }}</span>
-                                {% endif %}
-                            </div>
-                            <div class="flex items-center justify-between">
-                                <h2 class="text-xl font-bold text-wrap">{{ article.title }}</h2>
-                            </div>
-                            <p>{{ article.content|length > 100 ? article.content|slice(0, 97) ~ '...' : article.content }}</p>
-                            <div class="flex flex-wrap gap-2 mt-5">
-                                {% for category in article.categories %}
-                                    <div class="text-red-400 border-1 border-red-400 rounded-md px-2">
-                                        <span>{{ category.title }}</span>
-                                    </div>
-                                {% endfor %}
-                            </div>
-                        </div>
+                        {{ include('article/_article_item_list.html.twig', {'article': article}) }}
                     </a>
                 {% endfor %}
 
                 <div class="flex items-center justify-end text-md mt-4">
                     <a href="{{ path('app_article_index', {'page': ((currentPage > 1) ? (currentPage - 1) : currentPage) }) }}" class="border-1 border-red-400 rounded-l-md px-2 py-1"><span>Précédent</span></a>
                     {% for i in 1 .. totalPages %}
-                        <a href="{{ path('app_article_index', {'page': ((currentPage > 1) ? (currentPage - 1) : currentPage) }) }}" class="border-1 border-red-400 px-2 py-1 {{ currentPage == i ? 'text-neutral-200' : '' }}"><span>{{ i }}</span></a>
+                        <a href="{{ path('app_article_index', {'page': ((currentPage > 1) ? (currentPage - 1) : currentPage) }) }}" class="border-t-1 border-b-1 border-red-400 px-2 py-1 {{ currentPage == i ? 'text-neutral-300' : '' }}"><span>{{ i }}</span></a>
                     {% endfor %}
                     <a href="{{ path('app_article_index', {'page': (currentPage + 1) }) }}" class="border-1 border-red-400 rounded-r-md px-2 py-1"><span>Suivant</span></a>
                 </div>
@@ -73,11 +38,23 @@
                     <h3 class="font-normal text-center">
                         Pas d'article pour le moment
                     </h3>
-                    <a href="{{ path('app_article_new') }}" class="block bg-neutral-50 border-1 border-red-400 text-red-400 rounded-sm px-4 py-1 mt-2 transition-all delay-50 hover:bg-red-400 hover:text-red-50">
-                        <span>Créez un article</span>
+                    <a href="{{ path('app_article_new') }}">
+                        {{ include('components/buttons/_button_outline.html.twig', {'button_label' : 'Créez un article'} ) }}
                     </a>
                 </div>
             {% endif %}
+        </div>
+    </div>
+    <div class="w-1/5 border-l-1 border-neutral-300 pl-8">
+        <a href="{{ path('app_category_index') }}" class="block text-red-400 font-bold text-center text-lg">
+            <u>Tous les catégories</u>
+        </h4>
+        <div class="mt-2">
+            {% for category in categories %}
+                <a href="{{ path('app_category_show', {'id': category.id}) }}">
+                    {{ include('category/_category_name_list.html.twig', {'category_label': category.title}) }}
+                </a>
+            {% endfor %}
         </div>
     </div>
 

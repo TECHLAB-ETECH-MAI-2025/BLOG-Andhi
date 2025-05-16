@@ -3,17 +3,20 @@
 {% block title %}Modification Categorie - Mon Blog{% endblock %}
 
 {% block body %}
-    <div class="flex items-center gap-4 mb-4">
-        <a href="{{ path('app_category_show', {'id': category.id}) }}" class="w-8 h-8 min-w-8 flex items-center justify-center border-1 border-neutral-400 rounded-4xl text-lg pb-0.5">
-            <span>{{ '<' }}</span>
-        </a>
-        <h1 class="font-normal text-4xl">Modifier la catégorie</h1>
-    </div>
+    <div class="mb-10">
+        {{ 
+            include(
+                'components/header/_navbar.html.twig',
+                {
+                    'go_back': path('app_category_show', {'id': category.id}),
+                    'nav_title': "Modification de la catégorie"
+                }
+                )
+        }}
+    </div> 
 
     {{ include('category/_form.html.twig') }}
 
-    <div class="flex gap-2">
     {{ include('category/_delete_form.html.twig') }}
-    </div>
     
 {% endblock %}

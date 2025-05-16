@@ -1,6 +1,6 @@
 {{ form_start(form) }}
     {{ form_widget(form) }}
-    <button class="block bg-red-400 border-1 text-neutral-50 rounded-md px-4 py-1 mt-2 transition-all delay-50 cursor-pointer hover:bg-neutral-50 hover:text-red-400">
-        {{ button_label|default('Enregistrer') }}
+    <button>
+        {{ include('components/buttons/_button_solid.html.twig', {'button_label': 'Enregistrer'}) }}
     </button>
 {{ form_end(form) }}

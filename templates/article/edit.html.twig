@@ -1,13 +1,21 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit Article{% endblock %}
+{% block title %}Modification article - Mon Blog{% endblock %}
 
 {% block body %}
-    <h1>Edit Article</h1>
+    <div class="mb-10">
+        {{ 
+            include(
+                'components/header/_navbar.html.twig',
+                {
+                    'go_back': path('app_article_show', {id: article.id}),
+                    'nav_title': "Modification de l'article"
+                }
+                )
+        }}
+    </div>
 
-    {{ include('article/_form.html.twig', {'button_label': 'Update'}) }}
-
-    <a href="{{ path('app_article_index') }}">back to list</a>
+    {{ include('article/_form.html.twig', {'button_label': 'Modifier l\'article'}) }}
 
     {{ include('article/_delete_form.html.twig') }}
 {% endblock %}

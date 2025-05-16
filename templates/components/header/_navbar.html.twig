@@ -1,0 +1,8 @@
+<div class="flex items-center gap-4 mb-4">
+    {% if go_back %}
+        <a href="{{ go_back }}" class="w-8 h-8 min-w-8 flex items-center justify-center border-1 border-neutral-400 rounded-4xl text-lg pb-0.5">
+            <span>{{ '<' }}</span>
+        </a>    
+    {% endif %}
+    <h1 class="font-normal text-4xl">{{ nav_title }}</h1>
+</div>
