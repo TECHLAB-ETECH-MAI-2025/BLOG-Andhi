@@ -1,62 +1,48 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Articles - Mon Blog{% endblock %}
+{% block title %}Articles - {{ parent() }}{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('article_list') }}
+{% endblock %}
 
 {% block body %}
 
-<div class="w-full flex gap-2">
+{{ include(
+    'components/header/_navbar.html.twig',
+    {
+        'navList': [
+            {name: "Home", path: "app_public_home"},
+            {name: "Article", path: "app_article_index"},
+            {name: "Catégories", path: "app_category_index"},
+        ],
+        'navAction': [],
+        'active': "Article"
+    }
+    )
+}}
 
-    <div class="w-4/5 pr-8">
-        <div class="flex items-center justify-between mb-4">
-            <h1 class="font-normal text-4xl">Articles</h1>
-            {% if articles|length > 0 %}
-                <a href="{{ path('app_article_new') }}">
-                    {{ include('components/buttons/_button_outline.html.twig', {'button_label' : 'Créez un article'} ) }}
-                </a>
-            {% endif %}
-        </div>
-        <div class="grid gap-4 mt-8">
-            {% if articles|length > 0 %}
-                {% for article in articles %}
-                    {% set today = article.createdAt|date("Y-m-d") == "now"|date("Y-m-d") %}
-                    {% set yesterday = article.createdAt|date("Y-m-d") == ("-1 day"|date("Y-m-d")) %}
-                    <a href="{{ path('app_article_show', {id: article.id}) }}">
-                        {{ include('article/_article_item_list.html.twig', {'article': article}) }}
-                    </a>
-                {% endfor %}
+<div class="container py-4">
 
-                <div class="flex items-center justify-end text-md mt-4">
-                    <a href="{{ path('app_article_index', {'page': ((currentPage > 1) ? (currentPage - 1) : currentPage) }) }}" class="border-1 border-red-400 rounded-l-md px-2 py-1"><span>Précédent</span></a>
-                    {% for i in 1 .. totalPages %}
-                        <a href="{{ path('app_article_index', {'page': ((currentPage > 1) ? (currentPage - 1) : currentPage) }) }}" class="border-t-1 border-b-1 border-red-400 px-2 py-1 {{ currentPage == i ? 'text-neutral-300' : '' }}"><span>{{ i }}</span></a>
-                    {% endfor %}
-                    <a href="{{ path('app_article_index', {'page': (currentPage + 1) }) }}" class="border-1 border-red-400 rounded-r-md px-2 py-1"><span>Suivant</span></a>
-                </div>
+    <a href="{{ path('app_article_new') }}" class="btn btn-success">
+        Ajouter un article
+    </a>
 
-            {% else %}
-                <div class="justify-items-center p-8">
-                    <h3 class="font-normal text-center">
-                        Pas d'article pour le moment
-                    </h3>
-                    <a href="{{ path('app_article_new') }}">
-                        {{ include('components/buttons/_button_outline.html.twig', {'button_label' : 'Créez un article'} ) }}
-                    </a>
-                </div>
-            {% endif %}
-        </div>
-    </div>
-    <div class="w-1/5 border-l-1 border-neutral-300 pl-8">
-        <a href="{{ path('app_category_index') }}" class="block text-red-400 font-bold text-center text-lg">
-            <u>Tous les catégories</u>
-        </h4>
-        <div class="mt-2">
-            {% for category in categories %}
-                <a href="{{ path('app_category_show', {'id': category.id}) }}">
-                    {{ include('category/_category_name_list.html.twig', {'category_label': category.title}) }}
-                </a>
-            {% endfor %}
-        </div>
-    </div>
-
+    <table id="articles-table" class="table table-striped table-bordered dt-responsive nowrap" style="width:100%">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Titre</th>
+                <th>Par</th>
+                <th>Catégories</th>
+                <th>Likes</th>
+                <th>Commentaires</th>
+                <th>Date de création</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+    </table>
 </div>
+
 {% endblock %}

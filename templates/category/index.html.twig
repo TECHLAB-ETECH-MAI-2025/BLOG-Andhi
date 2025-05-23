@@ -1,42 +1,52 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Catégories - Mon Blog{% endblock %}
+{% block title %}Catégories - {{ parent() }}{% endblock %}
 
 {% block body %}
 
-    <div class="flex justify-between mb-5">
-        {{ 
-            include(
-                'components/header/_navbar.html.twig',
-                {
-                    'go_back': path('app_article_index'),
-                    'nav_title': "Tous les catégories"
-                }
-                )
-        }}
-        <a href="{{ path('app_category_new') }}">
-            {{ include('components/buttons/_button_outline.html.twig', {'button_label' : 'Ajouter une catégorie'} ) }}
-        </a>
+{{ include(
+    'components/header/_navbar.html.twig',
+    {
+        'navList': [
+            {name: "Home", path: "app_public_home"},
+            {name: "Article", path: "app_article_index"},
+            {name: "Catégories", path: "app_category_index"},
+        ],
+        'navAction': [],
+        'active': "Catégories"
+    }
+    )
+}}
+
+<div class="container py-4">
+
+    <div class="d-flex align-items-center justify-content-between">
+        <h1>Liste des catégorie</h1>
+        <a href="{{ path('app_category_new') }}" class="btn btn-success">Ajouter une catégorie</a>
     </div>
 
     {% set descriptionLength = 40 %}
 
+    <div class="py-4">
     {% for category in categories %}
-        <a href="{{ path('app_category_show', {'id': category.id}) }}">
+        <a href="{{ path('app_category_show', {'id': category.id}) }}" class="text-decoration-none text-reset">
             {{ include('category/_category_item_list.html.twig', {'category': category, 'description_length': descriptionLength}) }}
         </a>
         {% if not loop.last %}
             <hr class="border-neutral-300 mx-4">
         {% endif %}
         {% else %}
-            <div class="justify-items-center p-8">
+            <div class="p-8">
                 <h3 class="text-center">
                     Pas de catégorie
                 </h3>
-                <a href="{{ path('app_category_new') }}">
-                    {{ include('components/buttons/_button_outline.html.twig', {'button_label' : 'Ajouter une catégorie'} ) }}
+                <a href="{{ path('app_category_new') }}" class="d-table btn btn-primary mx-auto">
+                    Ajouter une catégorie
                 </a>
             </div>
     {% endfor %}
+    </div>
+
+</div>
     
 {% endblock %}

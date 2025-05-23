@@ -1,6 +1,6 @@
 <form method="post" action="{{ path('app_article_delete', {'id': article.id}) }}" onsubmit="return confirm('Are you sure you want to delete this item?');">
     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ article.id) }}">
-    <button>
-        {{ include('components/buttons/_button_outline.html.twig', {'button_label' : 'Supprimer'} ) }}
+    <button type="submit" class="btn btn-sm btn-danger">
+        Supprimer
     </button>
 </form>

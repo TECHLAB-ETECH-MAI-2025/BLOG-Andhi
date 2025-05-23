@@ -17,10 +17,10 @@ class CategoryType extends AbstractType
             ->add('title', TextType::class, [
                 'label' => 'Titre de la catégorie',
                 'label_attr' => [
-                    'class' => 'font-bold'
+                    'class' => 'd-block'
                 ],
                 'attr' => [
-                    'class' => 'block w-full border border-neutral-200 rounded-sm p-2 mb-2',
+                    'class' => 'd-block w-100 p-2 mb-2',
                     'placeholder' => 'Entrez un nom de catégorie',
                     'required' => true
                 ]
@@ -28,10 +28,10 @@ class CategoryType extends AbstractType
             ->add('description', TextareaType::class, [
                 'label' => 'Description',
                 'label_attr' => [
-                    'class' => 'font-bold'
+                    'class' => 'd-block'
                 ],
                 'attr' => [
-                    'class' => 'block w-full border border-neutral-200 rounded-sm p-2',
+                    'class' => 'd-block w-100 p-2 mb-2',
                     'rows' => 3,
                     'placeholder' => 'Écrivez la description de cette catégorie ici...',
                     'required' => true

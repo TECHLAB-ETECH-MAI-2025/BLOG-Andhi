@@ -1,20 +1,29 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Nouvelle Catégorie - Mon Blog{% endblock %}
+{% block title %}Nouvelle Catégorie - {{ parent() }}{% endblock %}
 
 {% block body %}
 
-    <div class="mb-10">
-        {{ 
-            include(
-                'components/header/_navbar.html.twig',
-                {
-                    'go_back': path('app_category_index'),
-                    'nav_title': "Ajouter une nouvelle catégorie"
-                }
-                )
-        }}
-    </div>
+{{ include(
+    'components/header/_navbar.html.twig',
+    {
+        'navList': [
+            {name: "Home", path: "app_public_home"},
+            {name: "Article", path: "app_article_index"},
+            {name: "Catégories", path: "app_category_index"},
+        ],
+        'navAction': [],
+        'active': "Catégories"
+    }
+    )
+}}
 
+<div class="container py-4">
+
+    <h1>Ajouter une catégorie</h1>
+    
     {{ include('category/_form.html.twig') }}
+
+</div>
+
 {% endblock %}

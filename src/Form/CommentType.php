@@ -14,25 +14,14 @@ class CommentType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('author', TextType::class, [
-                'label' => 'Votre nom',
-                'label_attr' => [
-                    'class' => 'font-bold'
-                ],
-                'attr' => [
-                    'class' => 'block w-full border border-neutral-200 rounded-sm p-2 mb-2',
-                    'placeholder' => 'Entrez un nom',
-                    'required' => true
-                ]
-            ])
             ->add('content', TextareaType::class, [
                 'label' => 'Votre commentaire',
                 'label_attr' => [
-                    'class' => 'font-bold'
+                    'class' => 'd-block'
                 ],
                 'attr' => [
-                    'class' => 'block w-full border border-neutral-200 rounded-sm p-2',
-                    'rows' => 3,
+                    'class' => 'd-block w-100 mb-1',
+                    'rows' => 2,
                     'placeholder' => 'Écrivez votre commentaire ici...',
                     'required' => true
                 ]

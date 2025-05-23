@@ -1,11 +1,11 @@
 {% set today = comment.createdAt|date("Y-m-d") == "now"|date("Y-m-d") %}
 {% set yesterday = comment.createdAt|date("Y-m-d") == ("-1 day"|date("Y-m-d")) %}
-<div class="bg-transparent rounded-md px-4 py-2 hover:bg-neutral-100">
-    <div class="flex items-center justify-between">
-        <div class="flex items-center gap-2">
-            <div class="text-lg"><strong>{{ comment.author }}</strong></div>
-            <span class="block text-neutral-300">-</span>
-            <div class="text-neutral-400">
+<div>
+    <div class="d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center gx-2">
+            <div class="text-lg"><strong>{{ comment.author.username }}</strong></div>
+            <span>-</span>
+            <div class="text-muted">
                 <i>
                     {% if today %}
                         {{ comment.createdAt|date("H:i") }}
@@ -20,8 +20,8 @@
         <div>
             <form method="post" action="{{ path('app_comment_delete', {'id': comment.id}) }}" onsubmit="return confirm('Are you sure you want to delete this item?');">
                 <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ comment.id) }}">
-                <button>
-                    {{ include('components/buttons/_button_outline.html.twig', {'button_label': 'Supprimer'}) }}
+                <button class="btn btn-danger">
+                    Supprimer
                 </button>
             </form>
         </div>

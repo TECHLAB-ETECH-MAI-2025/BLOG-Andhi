@@ -1,22 +1,35 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Modification Categorie - Mon Blog{% endblock %}
+{% block title %}Modification Categorie - {{ parent() }}{% endblock %}
 
 {% block body %}
-    <div class="mb-10">
-        {{ 
-            include(
-                'components/header/_navbar.html.twig',
-                {
-                    'go_back': path('app_category_show', {'id': category.id}),
-                    'nav_title': "Modification de la catégorie"
-                }
-                )
-        }}
-    </div> 
 
-    {{ include('category/_form.html.twig') }}
+{{ include(
+    'components/header/_navbar.html.twig',
+    {
+        'navList': [
+            {name: "Home", path: "app_public_home"},
+            {name: "Article", path: "app_article_index"},
+            {name: "Catégories", path: "app_category_index"},
+        ],
+        'navAction': [],
+        'active': "Catégories"
+    }
+    )
+}}
 
-    {{ include('category/_delete_form.html.twig') }}
+<div class="container py-4">
+
+    <h1>Modification de la catégorie</h1>
+
+    <div class="my-1">
+        {{ include('category/_form.html.twig') }}
+    </div>
+
+    <div class="my-1">
+        {{ include('category/_delete_form.html.twig') }}
+    </div>
+
+</div>
     
 {% endblock %}
