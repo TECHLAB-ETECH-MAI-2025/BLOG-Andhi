@@ -23,10 +23,11 @@ $(document).ready(function () {
 			{ data: "createdAt" },
 			{ data: "actions", orderable: false, searchable: false },
 		],
-		// language: {
-		// 	url: ""
-		// }
 		order: [[0, "desc"]],
+		dataSrc: function(json) {
+			console.log("Données reçues :", json);
+			return json.data;
+		}
 	});
 
 	const $searchInput = $("#search-article");

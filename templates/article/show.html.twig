@@ -14,29 +14,30 @@
     {
         'navList': [
             {name: "Home", path: "app_public_home"},
-            {name: "Article", path: "app_article_index"},
+            {name: "Articles", path: "app_article_index"},
             {name: "Catégories", path: "app_category_index"},
         ],
         'navAction': [],
-        'active': "Article"
+        'active': "Articles"
     }
     )
 }}
 
 <div class="container">  
 
-    <div class="text-muted my-4 ml-12">
-        <span><i>Publié le</i> : {{ article.createdAt|date('d/m/Y H:i') }}</span>
+    <div class="text-muted mt-4 mb-2 ml-12">
+        <div class="fs-4"><i>Par</i> <a href="{{ path('app_profile_index', {id: article.author.id}) }}"><strong>{{ article.author.username }}</strong></a></div>
+        <div><span><i>Publié le</i> : {{ article.createdAt|date('d/m/Y H:i') }}</span></div>
     </div>
 
-    <div class="mt-10">
+    <div class="my-4">
         <h1>
             {{ article.title }}
         </h1>
     </div>
 
-    <div class="mt-10">
-        <p class="">
+    <div class="mt-4 mb-5">
+        <p>
             {{ article.content }}
         </p>
     </div>
@@ -51,7 +52,7 @@
         <button data-article-id={{ article.id }} class="btn btn-sm text-light {{ is_liked ? "liked" : "" }} like-button">
             <strong id="likes-count" class="me-1">{{ article.likes|length }}</strong> <span id="is-liked">{{ is_liked ? "Je n'aime plus" : "J'aime" }}</span>
         </button>
-        {% if is_granted("IS_AUTHENTICATED_FULLY") %}
+        {% if article.author.id == app.user.id %}
             <div class="d-flex align-items-center justify-content-end">
                 <div class="me-2">
                     <a href="{{ path('app_article_edit', {'id': article.id}) }}">

@@ -9,7 +9,7 @@
     {
         'navList': [
             {name: "Home", path: "app_public_home"},
-            {name: "Article", path: "app_article_index"},
+            {name: "Articles", path: "app_article_index"},
             {name: "Catégories", path: "app_category_index"},
         ],
         'navAction': [],
@@ -33,7 +33,7 @@
             {{ include('category/_category_item_list.html.twig', {'category': category, 'description_length': descriptionLength}) }}
         </a>
         {% if not loop.last %}
-            <hr class="border-neutral-300 mx-4">
+            <hr class="mx-4">
         {% endif %}
         {% else %}
             <div class="p-8">

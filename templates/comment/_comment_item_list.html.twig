@@ -17,14 +17,16 @@
                 </i>
             </div>
         </div>
-        <div>
-            <form method="post" action="{{ path('app_comment_delete', {'id': comment.id}) }}" onsubmit="return confirm('Are you sure you want to delete this item?');">
-                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ comment.id) }}">
-                <button class="btn btn-danger">
-                    Supprimer
-                </button>
-            </form>
-        </div>
+        {% if comment.author.id == app.user.id %}
+            <div>
+                <form method="post" action="{{ path('app_comment_delete', {'id': comment.id}) }}" onsubmit="return confirm('Are you sure you want to delete this item?');">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ comment.id) }}">
+                    <button class="btn btn-danger">
+                        Supprimer
+                    </button>
+                </form>
+            </div>
+        {% endif %}
     </div>
     <p>{{ comment.content }}</p>
 </div>

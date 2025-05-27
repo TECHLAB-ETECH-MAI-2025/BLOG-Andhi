@@ -1,0 +1,107 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}TEMP Exchange Rate Calculator{% endblock %}
+
+{% block body %}
+<nav class="navbar position-sticky top-0 navbar-expand-lg navbar-dark bg-primary shadow" style="z-index: 9;">
+    <div class="container">
+        <div class="d-flex align-items-center justify-content-center m-auto">
+            <a class="navbar-brand" href="{{ path('app_temp_exchange') }}"><h2>EXERCICE 2 ✅</h2></a>
+        </div>
+    </div>
+</nav>
+
+<div class="container py-4">
+    <h1>Exchange Rate Calculator</h1>
+    <hr class="mx-4">
+    <form class="form-control-group text-center mt-2" name="formCalculator">
+        <input type="text" name="amount" class="form-control" placeholder="Entrer le montant à convertir">
+        <div class="d-flex align-items-center justify-content-around my-2">
+            <select name="fromCurr" class="form-select">
+                <option value="" selected>Cliquer pour choisir</option>
+                <option value="EUR">EUR - Euro</option>
+                <option value="USD">USD - Dollar Américain</option>
+                <option value="MGA">MGA - Ariary Malgache</option>
+            </select>
+            <button type="button" id="swap-curr" class="btn btn-outline-primary mx-2">Swap</button>
+            <select name="toCurr" class="form-select">
+                <option value="" selected>Cliquer pour choisir</option>
+                <option value="EUR">EUR - Euro</option>
+                <option value="USD">USD - Dollar Américain</option>
+                <option value="MGA">MGA - Ariary Malgache</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary my-2">Convertir</button>
+    </form>
+    <div id="result" class="bg-light text-center p-4 mt-2"></div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        const url = "{{ path('api_temp_exchange') }}"
+        async function getExchangeRate(url, formElement) {
+            result.innerHTML = `<div class="d-flex justify-content-center">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>`;
+            if (!formElement.amount.value.trim()) {
+                result.innerHTML = 'Montant non valide';
+                return;
+            }
+            if (parseFloat(formElement.amount.value.trim()) < 0) {
+                result.innerHTML = 'Le montant doit être supérieur ou egal à 0';
+                return;
+            }
+            if (formElement.fromCurr.value === formElement.toCurr.value) {
+                result.innerHTML = 'Les devises d\'origine et de destination ne peuvent pas être les mêmes. Veuillez choisir une autre';
+                return;
+            }
+            if (!formElement.fromCurr.value && !formElement.toCurr.value) {
+                result.innerHTML = 'Vous devez choisir les devises à convertir';
+                return;
+            }
+            try {
+                const formData = new FormData(formElement);
+                const response = await fetch(
+                    url, 
+                    {
+                        method: 'POST',
+                        body: formData
+                    }
+                );
+                if (!response.ok) {
+                    console.log("Response status : " + response.status);
+                }
+                let data = await response.json();
+                if (data.status === "error") {
+                    result.innerHTML = data.message;
+                    return;
+                }
+                data = data.content;
+                result.innerHTML = `
+                <div class="d-flex flex-column align-items-center justify-content-center">
+                    <span class="text-center">Le ${data.conversionInputDate}</span>
+                    <div><span>Montant en <strong>${data.conversionToCurrency}</strong> : <strong>${data.conversionAmountValue}</strong></span></div>
+                    <div><span>Montant en <strong>${data.conversionFromCurrency}</strong> : <strong class="text-danger">${data.convertedAmount}</strong></span></div>
+                </div>
+                `
+            } catch (error) {
+                console.error(error.message);
+            }
+        }
+        document.forms.formCalculator.addEventListener('submit', function(e) {
+            e.preventDefault();
+            getExchangeRate(url, this);
+        })
+        document.getElementById('swap-curr').addEventListener('click', function(e) {
+            e.preventDefault();
+            const form = document.forms.formCalculator;
+            const tempValue = form.fromCurr.value;
+            form.fromCurr.value = form.toCurr.value;
+            form.toCurr.value = tempValue;
+        })
+    </script>
+{% endblock %}

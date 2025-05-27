@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ user_target.username }} - {{ parent() }}{% endblock %}
+
+{% block body %}
+
+{{ include(
+    'components/header/_navbar.html.twig',
+    {
+        'navList': [
+            {name: "Home", path: "app_public_home"},
+            {name: "Articles", path: "app_article_index"},
+            {name: "Catégories", path: "app_category_index"},
+        ],
+        'active': ""
+    }
+    )
+}}
+
+<div class="bg-primary text-light">
+    <div class="container py-5">
+        <h1>{{ user_target.username }}</h1>
+        <div>
+            <i>{{ user_target.email }}</i>
+        </div>
+        {% if app.user.id != user_target.id %}
+            <div class="d-flex align-items-center gap-2 mt-4">
+                <a href={{ path('app_chat_index', {receiverId: user_target.id}) }} class="btn btn-outline-light">
+                    Discuter
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="container py-4">
+    {% if app.user.id != user_target.id %}
+        <h2>Articles publié par {{ user_target.username }}</h2>
+        {% else %}
+        <h2>Vos articles</h2>
+    {% endif %}
+</div>
+    
+{% endblock %}
