@@ -8,14 +8,21 @@
       <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
         {% if navList %}
           {% for nav in navList %}
+            {% if not ((nav.path == "app_article_index" or nav.path == "app_category_index") and not is_granted("IS_AUTHENTICATED_FULLY")) %}
               <li class="nav-item">
                   <a class="nav-link {{ nav.name == active ? "active" : "" }} ms-2" href="{{ path(nav.path) }}">{{nav.name}}</a>
               </li>
+            {% endif %}
           {% endfor %}
+          {% if is_granted("IS_AUTHENTICATED_FULLY") %}
+            <li class="nav-item">
+              <a class="nav-link ms-2" href="{{ path('app_logout') }}">Se déconnecter</a>
+            </li>  
+          {% endif %}
         {% endif %}
         {% if is_granted("IS_AUTHENTICATED_FULLY") %}
           <li class="nav-item">
-              <a class="btn btn-outline-light ms-2" href="{{ path('app_logout') }}">Se deconnecter</a>
+              <a class="btn btn-outline-light ms-2" href="{{ path('app_profile_index', {id: app.user.id}) }}">{{ app.user.username }}</a>
           </li>
           {% else %}
           <li class="nav-item">

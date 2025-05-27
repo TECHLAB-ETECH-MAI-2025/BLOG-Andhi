@@ -8,13 +8,14 @@
     'components/header/_navbar.html.twig',
     {
         'navList': [
-            {name: "Home", path: "app_public_home"},
+            {name: "Accueil", path: "app_public_home"},
+            {name: "Articles", path: "app_article_index"},
             {name: "A propos", path: "app_public_home"},
         ],
         'navAction': [
             {name: "Se connecter", path: "app_login"}
         ],
-        'active': "Home"
+        'active': "Accueil"
     }
     )
 }}
@@ -38,8 +39,28 @@
 </div>
 
 <div class="container py-5">
-    <h2 class="text-2xl">Article populaire</h2>
+    <h2 class="text-2xl">Articles récents</h2>
+    <div class="row row-cols-2 align-items-stretch justify-content-between g-2">
+        {% for article in articles %}
+            <div class="col-4">
+                <div class="card px-4 py-4">
+                    <h4><a href="{{ path('app_article_show', {id: article.id}) }}" class="text-primary text-decoration-none">{{ article.title }}</a></h4>
+                    <p>{{ article.content|length > 75 ? article.content|slice(0, 72) ~ '...' : article.content }}</p>
+                    <div class="d-flex">
+                        <strong>{{ article.likes|length }} J'aime</strong>
+                        <span class="mx-3">|</span>
+                        <strong>{{ article.comments|length }} Commentaires</strong>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
 </div>
 
+<div class="bg-light">
+    <div class="container text-center p-4">
+        &copy; Mon Blog - 2025
+    </div>
+</div>
 
 {% endblock %}

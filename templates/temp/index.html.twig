@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}TEMP JsonPlaceholder{% endblock %}
+
+{% block body %}
+<div>
+    <h1>Hello EXERCICE! ✅</h1>
+    {% for item in content %}
+        <div class="my-2">{{ item.id }}- {{ item.title }}</span>
+    {% endfor %}
+</div>
+{% endblock %}

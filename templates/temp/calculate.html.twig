@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}TEMP Exchange Rate Calculator{% endblock %}
+
+{% block body %}
+<nav class="navbar position-sticky top-0 navbar-expand-lg navbar-dark bg-primary shadow" style="z-index: 9;">
+    <div class="container">
+        <div class="d-flex align-items-center justify-content-center m-auto">
+            <a class="navbar-brand" href="{{ path('app_temp_exchange') }}"><h2>EXERCICE 2 ✅</h2></a>
+        </div>
+    </div>
+</nav>
+
+<div class="container py-4">
+    <h1>Exchange Rate Calculator</h1>
+    <div class="form-control-group text-center">
+        <input type="text" id="amount" class="form-control" placeholder="Entrer le montant à convertir">
+        <button type="button" class="btn btn-primary my-2" onclick="getExchangeRate('{{ path('api_temp_exchange', {amount: 155}) }}')">Convertir</button>
+    </div>
+    <div id="result" class="bg-light text-center p-4 mt-2"></div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        async function getExchangeRate(url) {
+            const amount = document.getElementById('amount');
+            const result = document.getElementById('result');
+            result.innerHTML = '';
+            if (!amount.value.trim()) {
+                result.innerHTML = 'Montant non valide';
+                return;
+            }
+            if (parseFloat(amount.value.trim()) < 0) {
+                result.innerHTML = 'Le montant doit être supérieur ou egal à 0';
+                return;
+            }
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    console.log("Response status : " + response.status);
+                }
+                const data = await response.json();
+                result.innerHTML = `
+                <div class="d-flex flex-column align-items-center justify-content-center">
+                    <div><span>Montant en <strong>EUR</strong> : <strong>155</strong></span></div>
+                    <div><span>Montant en <strong>MGA</strong> : <strong>800.000</strong></span></div>
+                </div>
+                `
+            } catch (error) {
+                console.error(error.message);
+            }
+        }
+    </script>
+{% endblock %}

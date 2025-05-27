@@ -45,58 +45,63 @@ class ArticleRepository extends ServiceEntityRepository
        ];
    }
 
-   public function findForDataTable($start, $length, $search, $orderColumn, $orderDir): array
+   /**
+    * @return [] Returns an array of Article objects
+    */
+   public function getLastArticles($limit): array
    {
-        $qb = $this->createQueryBuilder('a')
-            ->leftJoin('a.categories', 'c')
-            ->leftJoin('a.comments', 'com')
-            ->leftJoin('a.likes', 'l')
-            ->leftJoin('a.author', 'u')
-            ->groupBy('a.id');
+        $articles = $this->createQueryBuilder('a')
+           ->orderBy('a.id', 'DESC')
+           ->setMaxResults($limit)
+           ->getQuery()
+           ->getResult();
 
-        // Appliquer la recherche si elle existe
-        if ($search) {
-            $qb->andWhere('a.title LIKE :search OR c.title LIKE :search OR u.username :search')
-                ->setParameter('search', '%' . $search . '%');
-        }
+       return $articles;
+   }
 
-        // Compter le nombre total d'articles
-        $totalCount = $this->createQueryBuilder('a')
-            ->select('COUNT(a.id)')
-            ->distinct()
-            ->getQuery()
-            ->getSingleScalarResult();
+   public function findForDataTable(int $start, int $length, ?string $search, string $orderColumn, string $orderDir): array
+{
+    $qb = $this->createQueryBuilder('a')
+        ->leftJoin('a.author', 'u')
+        ->leftJoin('a.categories', 'c')
+        ->addSelect('u', 'c');
 
-        // Compter le nombre d'articles filtrés
-        $filteredCountQb = clone $qb;
-        $filteredCount = $filteredCountQb
-            ->select('COUNT(DISTINCT a.id)')
-            ->getQuery()
-            ->getScalarResult();
-
-        // Appliquer le tri
-        if ($orderColumn === 'commentsCount') {
-            $qb->addSelect('COUNT(com.id) as commentsCount')
-                ->orderBy('commentsCount', $orderDir);
-        } elseif ($orderColumn === 'likesCount') {
-            $qb->addSelect('COUNT(l.id) as likesCount')
-                ->orderBy('likesCount', $orderDir);
-        } elseif ($orderColumn === 'categories') {
-            $qb->orderBy('c.title', $orderDir);
-        } else {
-            $qb->orderBy($orderColumn, $orderDir);
-        }
-
-        // Appliquer la pagination
-        $qb->setFirstResult($start)
-            ->setMaxResults($length);
-
-        return [
-            'data' => $qb->getQuery()->getResult(),
-            'totalCount' => $totalCount,
-            'filteredCount' => $filteredCount
-        ];
+    // Filtrage (recherche)
+    if (!empty($search)) {
+        $qb->andWhere('a.title LIKE :search OR u.username LIKE :search')
+           ->setParameter('search', '%' . $search . '%');
     }
+
+    // Clonage du QueryBuilder pour compter les résultats filtrés
+    $filteredQb = clone $qb;
+
+    // Pagination
+    $qb->setFirstResult($start)
+       ->setMaxResults($length);
+
+    // Tri
+    $qb->orderBy($orderColumn, $orderDir);
+
+    // Récupération des résultats paginés
+    $data = $qb->getQuery()->getResult();
+
+    // Nombre total (non filtré)
+    $total = $this->createQueryBuilder('a')
+        ->select('COUNT(a.id)')
+        ->getQuery()
+        ->getSingleScalarResult();
+
+    // Nombre filtré
+    $filtered = $filteredQb->select('COUNT(a.id)')
+        ->getQuery()
+        ->getSingleScalarResult();
+
+    return [
+        'data' => $data,
+        'totalCount' => (int) $total,
+        'filteredCount' => (int) $filtered,
+    ];
+}
 
     /**
      * Recherche des articles par titre

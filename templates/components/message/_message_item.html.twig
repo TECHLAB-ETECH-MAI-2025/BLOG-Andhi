@@ -1,0 +1,18 @@
+{% set today = message.createdAt|date("Y-m-d") == "now"|date("Y-m-d") %}
+{% set yesterday = message.createdAt|date("Y-m-d") == ("-1 day"|date("Y-m-d")) %}
+<div class="d-flex align-items-end gap-1 {{ message.sender.id == app.user.id ? "align-self-end" : "align-self-start flex-row-reverse" }}">
+    <i id="message-date">
+        {% if today %}
+            {{ message.createdAt|date("H:i:s") }}
+        {% elseif yesterday %}
+            Hier à {{ message.createdAt|date("H:i") }}
+        {% else %}
+            {{ message.createdAt|date("d M") }}
+        {% endif %}
+    </i>
+    <div class="d-flex flex-column">
+        <span id="message-value" class="rounded-4 px-3 py-1 {{ message.sender.id == app.user.id ? "bg-primary text-light align-self-end" : "bg-light text-dark align-self-start" }}">
+            {{ message.content }}
+        </span>
+    </div>
+</div>

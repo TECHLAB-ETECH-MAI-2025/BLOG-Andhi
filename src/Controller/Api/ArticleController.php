@@ -53,8 +53,11 @@ class ArticleController extends AbstractController
 							$this->generateUrl('app_article_show', ['id' => $article->getId()]),
 							htmlspecialchars($article->getTitle())
                 ),
-                'user' => $article->getAuthor()->getUsername(),
-                'categories' => implode(' ', $categoryNames),
+                'user' => sprintf('<a href="%s" class="text-dark text-decoration-none link:text-decoration-underline">%s</a>',
+							$this->generateUrl('app_profile_index', ['id' => $article->getAuthor()->getId()]),
+							htmlspecialchars($article->getAuthor()->getUsername())
+                ),
+                'categories' => implode(', ', $categoryNames),
                 'commentsCount' => $article->getComments()->count(),
                 'likesCount' => $article->getLikes()->count(),
                 'createdAt' => $article->getCreatedAt()->format('d/m/Y H:i'),

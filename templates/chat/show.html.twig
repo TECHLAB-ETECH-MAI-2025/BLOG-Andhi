@@ -1,0 +1,68 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Message avec {{ receiver.username }} - {{ parent() }}{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('chat') }}
+{% endblock %}
+
+{% block body %}
+
+<div class="position-sticky top-0">
+    {{ include(
+        'components/header/_navbar.html.twig',
+        {
+            'navList': [
+                {name: "Home", path: "app_public_home"},
+                {name: "Articles", path: "app_article_index"},
+                {name: "Catégories", path: "app_category_index"},
+            ],
+            'navAction': [],
+            'active': ""
+        }
+        )
+    }}
+    <div class="position-sticky top-0 container bg-white pt-4">
+        <h1>Chat avec <a href="{{ path('app_profile_index', {id: receiver.id}) }}">{{ receiver.username }}</a></h1>
+        <hr class="mx-4">
+    </div>
+</div>
+
+<div class="container">
+
+    <div>
+        <div id="message-list" class="d-flex flex-column gap-2">
+            {# {% for message in messages %}
+                {{ include('components/message/_message_item.html.twig', {'message': message}) }}
+            {% else %} #}
+            {% if messages|length == 0 %}
+                <span>Démarrer une conversation avec {{ receiver.username }}</span>
+                {% else %}
+                <div class="d-flex justify-content-center" id="load-message">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            {% endif %}
+            
+            {# {% endfor %} #}
+        </div>
+    </div>
+    
+    <hr class="mx-4">
+
+    <div class="bg-white position-sticky bottom-0 pt-1 pb-4">
+        <div class="d-flex align-items-start gap-1 mt-2">
+            {# {{ form_widget(form.content, {'attr': {'class': 'rounded w-100 px-2 py-1', 'autofocus': true}}) }} #}
+            <input type="hidden" id="receiver-id" value="{{receiver.id}}">
+            <input type="hidden" id="sender-id" value="{{app.user.id}}">
+            <textarea id="message-content" rows="2" class="rounded w-100 px-2 py-1" placeholder="Vore message" autofocus></textarea>
+            <button id="send-message" class="btn btn-primary">
+                Envoyer
+            </button>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
