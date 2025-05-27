@@ -13,10 +13,26 @@
 
 <div class="container py-4">
     <h1>Exchange Rate Calculator</h1>
-    <div class="form-control-group text-center">
-        <input type="text" id="amount" class="form-control" placeholder="Entrer le montant à convertir">
-        <button type="button" class="btn btn-primary my-2" onclick="getExchangeRate('{{ path('api_temp_exchange', {amount: 155}) }}')">Convertir</button>
-    </div>
+    <hr class="mx-4">
+    <form class="form-control-group text-center mt-2" name="formCalculator">
+        <input type="text" name="amount" class="form-control" placeholder="Entrer le montant à convertir">
+        <div class="d-flex align-items-center justify-content-around my-2">
+            <select name="fromCurr" class="form-select">
+                <option value="" selected>Cliquer pour choisir</option>
+                <option value="EUR">EUR - Euro</option>
+                <option value="USD">USD - Dollar Américain</option>
+                <option value="MGA">MGA - Ariary Malgache</option>
+            </select>
+            <button type="button" id="swap-curr" class="btn btn-outline-primary mx-2">Swap</button>
+            <select name="toCurr" class="form-select">
+                <option value="" selected>Cliquer pour choisir</option>
+                <option value="EUR">EUR - Euro</option>
+                <option value="USD">USD - Dollar Américain</option>
+                <option value="MGA">MGA - Ariary Malgache</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary my-2">Convertir</button>
+    </form>
     <div id="result" class="bg-light text-center p-4 mt-2"></div>
 </div>
 
@@ -24,33 +40,68 @@
 
 {% block javascripts %}
     <script>
-        async function getExchangeRate(url) {
-            const amount = document.getElementById('amount');
-            const result = document.getElementById('result');
-            result.innerHTML = '';
-            if (!amount.value.trim()) {
+        const url = "{{ path('api_temp_exchange') }}"
+        async function getExchangeRate(url, formElement) {
+            result.innerHTML = `<div class="d-flex justify-content-center">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>`;
+            if (!formElement.amount.value.trim()) {
                 result.innerHTML = 'Montant non valide';
                 return;
             }
-            if (parseFloat(amount.value.trim()) < 0) {
+            if (parseFloat(formElement.amount.value.trim()) < 0) {
                 result.innerHTML = 'Le montant doit être supérieur ou egal à 0';
                 return;
             }
+            if (formElement.fromCurr.value === formElement.toCurr.value) {
+                result.innerHTML = 'Les devises d\'origine et de destination ne peuvent pas être les mêmes. Veuillez choisir une autre';
+                return;
+            }
+            if (!formElement.fromCurr.value && !formElement.toCurr.value) {
+                result.innerHTML = 'Vous devez choisir les devises à convertir';
+                return;
+            }
             try {
-                const response = await fetch(url);
+                const formData = new FormData(formElement);
+                const response = await fetch(
+                    url, 
+                    {
+                        method: 'POST',
+                        body: formData
+                    }
+                );
                 if (!response.ok) {
                     console.log("Response status : " + response.status);
                 }
-                const data = await response.json();
+                let data = await response.json();
+                if (data.status === "error") {
+                    result.innerHTML = data.message;
+                    return;
+                }
+                data = data.content;
                 result.innerHTML = `
                 <div class="d-flex flex-column align-items-center justify-content-center">
-                    <div><span>Montant en <strong>EUR</strong> : <strong>155</strong></span></div>
-                    <div><span>Montant en <strong>MGA</strong> : <strong>800.000</strong></span></div>
+                    <span class="text-center">Le ${data.conversionInputDate}</span>
+                    <div><span>Montant en <strong>${data.conversionToCurrency}</strong> : <strong>${data.conversionAmountValue}</strong></span></div>
+                    <div><span>Montant en <strong>${data.conversionFromCurrency}</strong> : <strong class="text-danger">${data.convertedAmount}</strong></span></div>
                 </div>
                 `
             } catch (error) {
                 console.error(error.message);
             }
         }
+        document.forms.formCalculator.addEventListener('submit', function(e) {
+            e.preventDefault();
+            getExchangeRate(url, this);
+        })
+        document.getElementById('swap-curr').addEventListener('click', function(e) {
+            e.preventDefault();
+            const form = document.forms.formCalculator;
+            const tempValue = form.fromCurr.value;
+            form.fromCurr.value = form.toCurr.value;
+            form.toCurr.value = tempValue;
+        })
     </script>
 {% endblock %}

@@ -3,10 +3,36 @@
 {% block title %}TEMP JsonPlaceholder{% endblock %}
 
 {% block body %}
-<div>
-    <h1>Hello EXERCICE! ✅</h1>
-    {% for item in content %}
-        <div class="my-2">{{ item.id }}- {{ item.title }}</span>
-    {% endfor %}
+<nav class="navbar position-sticky top-0 navbar-expand-lg navbar-dark bg-primary shadow" style="z-index: 9;">
+    <div class="container">
+        <div class="d-flex align-items-center justify-content-center m-auto">
+            <a class="navbar-brand" href="{{ path('app_temp_exchange') }}"><h2>EXERCICE 1 ✅</h2></a>
+        </div>
+    </div>
+</nav>
+
+<div class="container py-4">
+    <h1>JsonPlaceholder</h1>
+    <hr class="mx-4">
+    <div class="row align-items-stretch g-4 mt-2">
+        {% for item in content %}
+            <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                <div class="card h-100">
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        <div>
+                            <h5 class="card-title">{{ item.title }}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">{{ item.id }}</h6>
+                            <p class="card-text">{{ item.body }}</p>
+                        </div>
+                        <div>
+                            <a href="#" class="card-link">Par {{ item.userId }}</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <span>Json vide ou on a une erreur</span>
+        {% endfor %}
+    </div>
 </div>
 {% endblock %}

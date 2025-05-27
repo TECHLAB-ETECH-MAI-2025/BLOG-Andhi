@@ -4,6 +4,7 @@ Bienvenue sur BLOG-Andhi !
 Ce projet a été réalisé dans le cadre d'un techlab organisé par **Etech**. BLOG-Andhi est une application web créé avec PHP Symfony qui permet de publier, lire et gérer des articles via une interface propre et moderne.
 
 ## Capture d'écran
+### Etape 1: 
 <table>
   <tr>
     <th>Accueil du blog</th>
@@ -22,6 +23,9 @@ Ce projet a été réalisé dans le cadre d'un techlab organisé par **Etech**. 
     </td>
   </tr>
 </table>
+
+### Etape 2: Exercices
+<img src="screenshots/step%232/exchange-rate-calculator.gif" alt="Exo2" width="500">
 
 ## Fonctionnalités
 

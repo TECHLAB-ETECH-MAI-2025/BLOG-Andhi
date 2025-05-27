@@ -10,18 +10,21 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class TempController extends AbstractController
 {
-    #[Route('/api/exchange-rate-calculator/{amount}', name: 'api_temp_exchange', methods: ['GET'])]
-    public function calculate(TempService $tempService, int $amount): JsonResponse
+    #[Route('/api/exchange-rate-calculator', name: 'api_temp_exchange', methods: ['POST'])]
+    public function calculate(Request $request, TempService $tempService): JsonResponse
     {
-        if (!$amount) {
+        $amount = $request->request->get('amount');
+        $fromCurr = $request->request->get('fromCurr');
+        $toCurr = $request->request->get('toCurr');
+        if (!$amount && !$fromCurr && $toCurr) {
             return new JsonResponse([
                 'status' => 'error',
-                'message' => 'Amount error'
-            ], 400);
+                'message' => 'Erreur du montant ou des devises'
+            ], 200);
         }
-        $content = $tempService->getCalcultator($amount);
+        $content = $tempService->getCalcultator($amount, $fromCurr, $toCurr);
         return new JsonResponse([
-            'test' => 'test ok',
+            'status' => 'success',
             'content' => $content
         ]);
     }
