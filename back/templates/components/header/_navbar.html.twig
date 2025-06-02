@@ -1,0 +1,28 @@
+<nav class="navbar position-sticky top-0 navbar-expand-lg navbar-dark bg-primary shadow" style="z-index: 9;">
+  <div class="container">
+    <a class="navbar-brand" href="{{ path('app_public_home') }}"><h2>Mon Blog</h2></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+        {% if navList %}
+          {% for nav in navList %}
+              <li class="nav-item">
+                  <a class="nav-link {{ nav.name == active ? "active" : "" }} ms-2" href="{{ path(nav.path) }}">{{nav.name}}</a>
+              </li>
+          {% endfor %}
+        {% endif %}
+        {% if is_granted("IS_AUTHENTICATED_FULLY") %}
+          <li class="nav-item">
+              <a class="btn btn-outline-light ms-2" href="{{ path('app_logout') }}">Se deconnecter</a>
+          </li>
+          {% else %}
+          <li class="nav-item">
+              <a class="btn btn-outline-light ms-2" href="{{ path('app_login') }}">Se connecter</a>
+          </li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>

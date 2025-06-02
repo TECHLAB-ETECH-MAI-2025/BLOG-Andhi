@@ -1,0 +1,21 @@
+<div class="py-1">
+    <div class="d-flex align-items-center justify-content-between">
+        {% set today = category.createdAt|date("Y-m-d") == "now"|date("Y-m-d") %}
+        {% set yesterday = category.createdAt|date("Y-m-d") == ("-1 day"|date("Y-m-d")) %}
+        <h2>{{ category.title }}</h2>
+        <div class="text-sm">
+            <i>
+                {% if today %}
+                    {{ category.createdAt|date("H:i") }}
+                {% elseif yesterday %}
+                    Hier
+                {% else %}
+                    {{ category.createdAt|date("d M") }}
+                {% endif %}
+            </i>
+        </div>
+    </div>
+    <p class="text-decoration-none">
+        {{ category.description }}
+    </p>
+</div>

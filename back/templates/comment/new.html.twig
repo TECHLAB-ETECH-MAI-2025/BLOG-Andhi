@@ -1,0 +1,6 @@
+{{ form_start(commentForm, { attr: { id: 'comment-form', action: path("api_article_comment", {'id': article.id}) } }) }}
+    {{ form_widget(commentForm) }}
+    <button type="submit" class="btn btn-primary">
+        Commenter
+    </button>
+{{ form_end(commentForm) }}

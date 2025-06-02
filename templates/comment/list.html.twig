@@ -1,9 +1,0 @@
-<div id="comments-list" class="flex flex-col gap-2">
-    {% for comment in comments %}
-        {{ include('comment/_comment_item_list.html.twig', {'comment': comment}) }}
-        {% else %}
-        <div id="no-comment" class="flex items-center justify-center text-lg m-6">
-            <span>Aucun commentaire</span>
-        </div>
-    {% endfor %}
-</div>
