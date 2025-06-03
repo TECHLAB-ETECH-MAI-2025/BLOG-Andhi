@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -10,6 +11,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
@@ -44,6 +47,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __construct()
     {
         $this->articles = new ArrayCollection();
+    }
+
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
+    {
+        $metadata->addPropertyConstraint('username', new Assert\Length(
+            min: 2,
+            max: 20,
+            minMessage: 'Your first name must be at least {{ limit }} characters long',
+            maxMessage: 'Your first name cannot be longer than {{ limit }} characters',
+        ));
+        $metadata->addPropertyConstraint('email', new Assert\Email(
+            message: 'The email "{{ value }}" is not a valid email.'
+        ));
+        $metadata->addPropertyConstraint('password', new Assert\NotBlank());
     }
 
     public function getId(): ?int
@@ -152,7 +169,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if (!$this->articles->contains($article)) {
             $this->articles->add($article);
-            $article->setUser($this);
+            $article->setAuthor($this);
         }
 
         return $this;
@@ -162,8 +179,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if ($this->articles->removeElement($article)) {
             // set the owning side to null (unless already changed)
-            if ($article->getUser() === $this) {
-                $article->setUser(null);
+            if ($article->getAuthor() === $this) {
+                $article->setAuthor(null);
             }
         }
 
