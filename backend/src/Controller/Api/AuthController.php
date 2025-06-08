@@ -2,8 +2,10 @@
 
 namespace App\Controller\Api;
 
+use App\DTO\UserDTO;
 use App\Entity\User;
 use App\Repository\UserRepository;
+use App\Services\TokenServices;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -12,95 +14,89 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
+#[Route('/api')]
 class AuthController extends ApiController
 {
-    #[Route(path: '/api/login', methods: ['POST'])]
+    #[Route(path: '/login', methods: ['POST'])]
     // public function index(#[CurrentUser] ?User $user): Response
-    public function index(Request $request, UserRepository $userRepo): JsonResponse
+    public function login(Request $request, UserRepository $userRepo): JsonResponse
     {
         try {
-
             $data = json_decode($request->getContent(), true);
 
-            $email = $data['email'] ?? null;
-            $password = $data['password'] ?? null;
+            $reqEmail = $data['email'] ?? null;
+            $reqPassword = $data['password'] ?? null;
 
-            if (!$email || !$password) {
+            if (!$reqEmail || !$reqPassword) {
                 return $this->error('Empty input');
             }
-            
+
             $user = $userRepo->findOneBy([
-                'email' => $email,
+                'email' => $reqEmail,
             ]);
-            
-            if (null === $user || !password_verify($password, $user->getPassword())) {
+
+            if (null === $user || !password_verify($reqPassword, $user->getPassword())) {
                 return $this->error('Credential error');
             }
-    
-            // temporary token
-            $token = '1234';
-    
+
+            
+            $resUser = new UserDTO();
+            $resUser->id = $user->getId();
+            $resUser->username = $user->getUsername();
+            $resUser->email = $user->getEmail();
+            
+            // Generate token
+            $token = TokenServices::createToken($user);
+
             return $this->success([
-                'user' => [
-                    'id' => $user->getId(),
-                    'username' => $user->getUsername(),
-                    'email' => $user->getEmail(),
-                ],
+                'user' => $resUser,
                 'token' => $token
             ], 'User logged in successfully');
-            
         } catch (\Throwable $th) {
-
             return $this->error($th->getMessage());
-
         }
-        
     }
 
-    #[Route(path: '/api/logout', methods: ['POST'])]
+    #[Route(path: '/logout', methods: ['POST'])]
     public function logout(): JsonResponse
     {
-        
         return $this->success([], 'User logged out successfully');
-
     }
 
-    #[Route(path: '/api/register', methods: ['POST'])]
+    #[Route(path: '/register', methods: ['POST'])]
     public function register(
         Request $request,
         UserRepository $userRepo,
         UserPasswordHasherInterface $userPasswordHasher,
         ValidatorInterface $validator,
         EntityManagerInterface $em
-        ): JsonResponse
-    {
+    ): JsonResponse {
         try {
-
             $data = json_decode($request->getContent(), true);
 
-            $username = $data['username'] ?? null;
-            $email = $data['email'] ?? null;
-            $password = $data['password'] ?? null;
+            $reqUsername = $data['username'] ?? null;
+            $reqEmail = $data['email'] ?? null;
+            $reqPassword = $data['password'] ?? null;
 
-            if (!$username || !$email || !$password) {
+            if (!$reqUsername || !$reqEmail || !$reqPassword) {
                 return $this->error('Empty input');
             }
-            
+
             $emailAlreadyExist = $userRepo->findOneBy([
-                'email' => $email,
+                'email' => $reqEmail,
             ]);
-            
+
             if ($emailAlreadyExist) {
                 return $this->error('This email is already used');
             }
-    
+
             $user = new User();
-            $user->setUsername($username);
-            $user->setEmail($email);
+            $user->setUsername($reqUsername);
+            $user->setEmail($reqEmail);
             $user->setPassword(
                 $userPasswordHasher->hashPassword(
                     $user,
-                    $password
+                    $reqPassword
                 )
             );
             $user->setCreatedAt(new DateTimeImmutable());
@@ -113,19 +109,16 @@ class AuthController extends ApiController
 
             $em->persist($user);
             $em->flush();
-            
+
             return $this->success([
                 'user' => [
                     'id' => $user->getId(),
                     'username' => $user->getUsername(),
                     'email' => $user->getEmail(),
                 ],
-            ], 'User registered');
-            
+            ], 'User registered', 201);
         } catch (\Throwable $th) {
-
             return $this->error($th->getMessage());
-
         }
     }
 }

@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ORM\Entity(repositoryClass: ArticleRepository::class)]
 class Article
@@ -27,8 +28,8 @@ class Article
     #[Assert\Length(min: 10)]
     private ?string $content = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $createdAt = null;
+    #[ORM\Column(type: Types::DATE_IMMUTABLE)]
+    private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'articles')]
     private Collection $categories;
@@ -48,6 +49,22 @@ class Article
         $this->categories = new ArrayCollection();
         $this->comments = new ArrayCollection();
         $this->likes = new ArrayCollection();
+    }
+
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
+    {
+        $metadata->addPropertyConstraint('title', new Assert\Length(
+            min: 2,
+            max: 280,
+            minMessage: 'Title must be at least {{ limit }} characters long',
+            maxMessage: 'Title cannot be longer than {{ limit }} characters',
+        ));
+        $metadata->addPropertyConstraint('content', new Assert\Length(
+            min: 4,
+            max: 8192,
+            minMessage: 'Content must be at least {{ limit }} characters long',
+            maxMessage: 'Content cannot be longer than {{ limit }} characters',
+        ));
     }
 
     public function getId(): ?int
@@ -79,12 +96,12 @@ class Article
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeInterface
+    public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeInterface $createdAt): static
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
 
