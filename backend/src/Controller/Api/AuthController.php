@@ -77,9 +77,14 @@ class AuthController extends ApiController
             $reqUsername = $data['username'] ?? null;
             $reqEmail = $data['email'] ?? null;
             $reqPassword = $data['password'] ?? null;
+            $reqConfirmPassword = $data['confirmPassword'] ?? null;
 
-            if (!$reqUsername || !$reqEmail || !$reqPassword) {
+            if (!$reqUsername || !$reqEmail || !$reqPassword || !$reqConfirmPassword) {
                 return $this->error('Empty input');
+            }
+
+            if ($reqPassword !== $reqConfirmPassword) {
+                return $this->error('Password and confirmation password are not match');
             }
 
             $emailAlreadyExist = $userRepo->findOneBy([

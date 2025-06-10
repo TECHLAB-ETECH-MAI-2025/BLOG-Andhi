@@ -30,8 +30,6 @@ class AppAuthenticator extends AbstractLoginFormAuthenticator
     {
         $email = $request->request->get('email');
 
-        // dd($email);
-
         $request->getSession()->set(Security::LAST_USERNAME, $email);
 
         return new Passport(
