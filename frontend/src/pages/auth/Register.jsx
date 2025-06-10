@@ -107,7 +107,7 @@ function Register() {
 	};
 
 	return (
-		<div className="mvh-100 d-flex align-items-center justify-content-center">
+		<div className="min-vh-100 d-flex align-items-center justify-content-center">
 			<div className="position-relative bg-light d-flex align-items-stretch text-center rounded-5 shadow-lg overflow-hidden">
 				<div className="w-50 bg-primary d-flex flex-column align-items-center justify-content-around gap-3 text-light py-5">
 					<Link to="/" className="text-light text-decoration-none">

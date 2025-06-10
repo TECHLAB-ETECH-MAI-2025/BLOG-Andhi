@@ -82,7 +82,7 @@ function Login() {
 	};
 
 	return (
-		<div className="mvh-100 d-flex align-items-center justify-content-center">
+		<div className="min-vh-100 d-flex align-items-center justify-content-center">
 			<div className="position-relative bg-light d-flex align-items-stretch text-center rounded-5 shadow-lg overflow-hidden">
 				<div className="w-50 d-flex align-items-center justify-content-center p-4">
 					<div className="w-75 my-5">
