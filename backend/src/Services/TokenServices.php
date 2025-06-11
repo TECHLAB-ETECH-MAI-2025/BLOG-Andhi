@@ -16,7 +16,7 @@ class TokenServices {
 
         // Encode expiration date to unreadable string
         $expDate = base64_encode(json_encode([
-            'expDate' => time() + (10 * 3600)
+            'expDate' => time() + (30 * 24 * 60 * 60)
         ]));
         
         return $payload.'.'.$expDate;
