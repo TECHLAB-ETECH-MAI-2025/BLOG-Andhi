@@ -9,6 +9,6 @@ export const upfetch = up(fetch, () => ({
 
 export const API = up(fetch, () => ({
     headers: { Authorization: localStorage.getItem('token') },
-    baseUrl: SERVER_API_URL,
+    baseUrl: SERVER_API_URL + "/api",
 	timeout: 10000,
 }));

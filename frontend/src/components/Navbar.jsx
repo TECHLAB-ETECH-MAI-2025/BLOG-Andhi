@@ -8,13 +8,12 @@ import {
 	Nav,
 	NavbarBrand,
 } from "react-bootstrap";
-import { BsMoonStarsFill } from "react-icons/bs";
 import { Link } from "react-router";
 
 function Navbar() {
 	return (
 		<header>
-			<BsNavbar className=" w-100 position-fixed top-0 navbar-expand-lg navbar-light bg-white">
+			<BsNavbar className=" w-100 position-sticky top-0 navbar-expand-lg navbar-light bg-white">
 				<Container className="d-flex align-items-center justify-content-between px-0">
 					<NavbarBrand className="d-flex gap-4 py-1">
 						<Link to="/" className="text-decoration-none">
@@ -25,9 +24,6 @@ function Navbar() {
 								<strong className="fs-3">Daily Blog</strong>
 							</div>
 						</Link>
-						<Button variant="outline-dark" id="toggle-theme" className="rounded-4 px-3">
-							<BsMoonStarsFill />
-						</Button>
 					</NavbarBrand>
 					<div>
 						<NavbarToggle
@@ -38,10 +34,10 @@ function Navbar() {
 							aria-expanded="false"
 							aria-label="Toggle navigation"
 						>
-							<span class="navbar-toggler-icon"></span>
+							<span className="navbar-toggler-icon"></span>
 						</NavbarToggle>
-						<Nav class="collapse navbar-collapse" id="navbarSupportedContent">
-							<ul class="navbar-nav align-items-center gap-2">
+						<Nav className="collapse navbar-collapse" id="navbarSupportedContent">
+							<ul className="navbar-nav align-items-center gap-2">
 								<NavItem>
 									<Link to={"/contact"} className="nav-link">
 										Contact
