@@ -1,10 +1,13 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { BsMoonStarsFill } from "react-icons/bs";
-import { Alert, Button, Container, Form, Image } from "react-bootstrap";
+import { Alert, Button, Form, Image } from "react-bootstrap";
 import { Link, useLocation } from "react-router";
 import { upfetch } from "../../config/Up";
+import { AuthContext } from "../../config/AuthContext";
 
 function Login() {
+	const { saveToken } = useContext(AuthContext);
+
 	const { state } = useLocation();
 
 	const [loginForm, setLoginForm] = useState({
@@ -69,7 +72,7 @@ function Login() {
 					}));
 					return;
 				}
-				localStorage.setItem('token', res.token);
+				saveToken(res.token);
 			})
 			.catch((err) => {
 				setValidForm(() => ({
