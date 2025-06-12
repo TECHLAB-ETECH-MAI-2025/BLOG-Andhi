@@ -12,10 +12,11 @@ import {
     Stack,
 } from "react-bootstrap";
 import Navbar from "../../components/Navbar";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { BsChatSquareDotsFill, BsClockFill, BsHeartFill, BsSearch } from "react-icons/bs";
 import { API } from "../../config/Up";
 import { Link } from "react-router";
+import { AuthContext } from "../../config/AuthContext";
 
 function SingleArticle({ article, isRecent = true }) {
 	return (
@@ -62,6 +63,7 @@ function SingleArticle({ article, isRecent = true }) {
 }
 
 function IndexArticle() {
+	const { token } = useContext(AuthContext);
 	const [topArticles, setTopArticles] = useState([]);
 	const [recentArticles, setRecentArticles] = useState([]);
 
@@ -72,8 +74,9 @@ function IndexArticle() {
     });
 
 	useEffect(() => {
-		API("/articles")
+		API(token)("/articles")
 			.then((res) => {
+				console.log(res);
 				if (!res.success) {
 					setTopArticles([]);
                     return;

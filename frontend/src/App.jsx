@@ -11,8 +11,8 @@ import { AuthProvider } from "./config/AuthContext";
 
 function App() {
 	return (
-		<AuthProvider>
-			<BrowserRouter>
+		<BrowserRouter>
+			<AuthProvider>
 				<Routes>
 					<Route index element={<Home />} />
 					<Route path="about" element={<About />} />
@@ -32,8 +32,8 @@ function App() {
 					</Route>
 					<Route path="*" element={<NotFound />} />
 				</Routes>
-			</BrowserRouter>
-		</AuthProvider>
+			</AuthProvider>
+		</BrowserRouter>
 	);
 }
 

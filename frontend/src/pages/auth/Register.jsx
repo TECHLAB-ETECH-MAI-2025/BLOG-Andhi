@@ -53,7 +53,7 @@ function Register() {
 			setValidForm((prevState) => ({
 				...prevState,
 				isValid: false,
-				message: "Minimum password is 6",
+				message: "Minimum password length is 6",
 			}));
 			return;
 		}

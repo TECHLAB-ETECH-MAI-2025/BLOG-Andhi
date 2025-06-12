@@ -8,6 +8,7 @@ use App\Entity\Article;
 use App\Entity\Category;
 use App\Entity\User;
 use App\Repository\ArticleRepository;
+use App\Services\TokenServices;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,9 +19,12 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class ArticleController extends ApiController
 {
     #[Route('/articles', methods: ['GET'])]
-    public function index(ArticleRepository $articleRepository): JsonResponse
+    public function index(Request $request, ArticleRepository $articleRepository): JsonResponse
     {
         try {
+            // if (!TokenServices::verifyToken($request->headers->get('Authorization'))) {
+            //     return $this->error('Forbidden request');
+            // }
             // $reqPage = $request->query->getInt('page');
             $data = $articleRepository->findAll();
             

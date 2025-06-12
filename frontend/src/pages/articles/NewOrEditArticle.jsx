@@ -1,14 +1,24 @@
 import { Alert, Button, Col, Container, FloatingLabel, Form, Row, Stack } from "react-bootstrap";
 import Navbar from "../../components/Navbar";
-import { BsArrowCounterclockwise, BsArrowLeftShort, BsBoxArrowInUp, BsCheck, BsCheck2Circle, BsClockFill, BsTrash } from "react-icons/bs";
-import { useEffect, useState } from "react";
+import {
+	BsArrowCounterclockwise,
+	BsArrowLeftShort,
+	BsBoxArrowInUp,
+	BsCheck,
+	BsCheck2Circle,
+	BsClockFill,
+	BsTrash,
+} from "react-icons/bs";
+import { useContext, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router";
 import { API } from "../../config/Up";
+import { AuthContext } from "../../config/AuthContext";
 
 const NEW_ARTICLE = "NEW_ARTICLE";
 const EDIT_ARTICLE = "EDIT_ARTICLE";
 
 function NewOrEditArticle({ newOrEdit = NEW_ARTICLE }) {
+	const { token } = useContext(AuthContext);
 	const { id } = useParams();
 	const { state } = useLocation();
 	const navigate = useNavigate();
@@ -111,7 +121,7 @@ function NewOrEditArticle({ newOrEdit = NEW_ARTICLE }) {
 				return;
 		}
 
-		API(APICall.url, {
+		API(token)(APICall.url, {
 			method: APICall.method,
 			body: {
 				title: article?.title.trim(),
@@ -167,7 +177,7 @@ function NewOrEditArticle({ newOrEdit = NEW_ARTICLE }) {
 			isValid: true,
 		}));
 
-		API("/article/" + article.id + "/delete", {
+		API(token)("/article/" + article.id + "/delete", {
 			method: "DELETE",
 		})
 			.then((res) => {
@@ -198,7 +208,7 @@ function NewOrEditArticle({ newOrEdit = NEW_ARTICLE }) {
 
 	useEffect(() => {
 		if (!state && newOrEdit === EDIT_ARTICLE) {
-			API("/article/" + id)
+			API(token)("/article/" + id)
 				.then((res) => {
 					if (!res.success) {
 						console.log(res.message);
@@ -213,7 +223,7 @@ function NewOrEditArticle({ newOrEdit = NEW_ARTICLE }) {
 							id: res.data.article.author_id,
 							username: res.data.article.author_username,
 						},
-						categories: res.data.article.categories
+						categories: res.data.article.categories,
 					});
 					setSelectedCategory(article.categories.map((v) => v.id));
 				})
@@ -222,7 +232,7 @@ function NewOrEditArticle({ newOrEdit = NEW_ARTICLE }) {
 				});
 		}
 		if (!listCategory.length) {
-			API("/categories")
+			API(token)("/categories")
 				.then((res) => {
 					if (!res.success) {
 						console.log(res.message);
@@ -284,16 +294,14 @@ function NewOrEditArticle({ newOrEdit = NEW_ARTICLE }) {
 								onChange={handleSelectCategories}
 							>
 								<option>Select any category</option>
-								{
-									listCategory &&
+								{listCategory &&
 									listCategory.map((category) => {
 										return (
 											<option key={category.id} value={category.id}>
 												{category.name}
 											</option>
 										);
-									})
-								}
+									})}
 							</Form.Select>
 							{validForm.isSubmitting && !validForm.isValid && (
 								<Alert variant="danger">{validForm.message}</Alert>
@@ -305,8 +313,14 @@ function NewOrEditArticle({ newOrEdit = NEW_ARTICLE }) {
 										variant="light"
 										className="w-100 d-flex align-items-center justify-content-center gap-1 text-primary"
 									>
-										{newOrEdit === NEW_ARTICLE ? <BsBoxArrowInUp /> : <BsCheck2Circle /> }
-										<span>{newOrEdit === NEW_ARTICLE ? "Create" : "Update"}</span>
+										{newOrEdit === NEW_ARTICLE ? (
+											<BsBoxArrowInUp />
+										) : (
+											<BsCheck2Circle />
+										)}
+										<span>
+											{newOrEdit === NEW_ARTICLE ? "Create" : "Update"}
+										</span>
 									</Button>
 								</Col>
 								{newOrEdit === NEW_ARTICLE && (
@@ -338,9 +352,7 @@ function NewOrEditArticle({ newOrEdit = NEW_ARTICLE }) {
 
 						<Stack className="w-50 my-2">
 							<div className="position-sticky top-0 bg-white">
-								<h2 className="w-100 pb-3">
-									Preview section
-								</h2>
+								<h2 className="w-100 pb-3">Preview section</h2>
 								<hr />
 							</div>
 							{newOrEdit === EDIT_ARTICLE && (

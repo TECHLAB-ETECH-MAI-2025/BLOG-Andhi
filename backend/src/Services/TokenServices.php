@@ -22,7 +22,7 @@ class TokenServices {
         return $payload.'.'.$expDate;
     }
 
-    public static function verifyToken(string $token, ?User $user): bool {
+    public static function verifyToken(string $token, ?User $user = null): bool {
         $tokenVal = explode('.', $token);
         
         $expDate = json_decode(base64_decode($tokenVal[1]), true);

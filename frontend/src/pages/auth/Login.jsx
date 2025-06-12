@@ -1,11 +1,12 @@
 import { useContext, useState } from "react";
 import { BsMoonStarsFill } from "react-icons/bs";
 import { Alert, Button, Form, Image } from "react-bootstrap";
-import { Link, useLocation } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { upfetch } from "../../config/Up";
 import { AuthContext } from "../../config/AuthContext";
 
 function Login() {
+	const navigate = useNavigate();
 	const { saveToken } = useContext(AuthContext);
 
 	const { state } = useLocation();
@@ -72,7 +73,8 @@ function Login() {
 					}));
 					return;
 				}
-				saveToken(res.token);
+				// saveToken(res.token);
+				navigate("/article");
 			})
 			.catch((err) => {
 				setValidForm(() => ({

@@ -1,10 +1,11 @@
 import { Badge, Button, Card, Col, Container, Row, Spinner, Stack } from "react-bootstrap";
+import { AuthContext } from "../../config/AuthContext";
 import Navbar from "../../components/Navbar";
 import { Link, useNavigate, useParams } from "react-router";
 import { API } from "../../config/Up";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
-    BsArrowLeftShort,
+	BsArrowLeftShort,
 	BsChatSquareDots,
 	BsClockFill,
 	BsHeart,
@@ -14,6 +15,7 @@ import {
 } from "react-icons/bs";
 
 function ShowArticle() {
+	const { token } = useContext(AuthContext);
 	const { id } = useParams();
 	const navigate = useNavigate();
 
@@ -39,12 +41,12 @@ function ShowArticle() {
 
 	const handleClickLike = () => {};
 
-    const handleDelete = () => {
+	const handleDelete = () => {
 		if (!article?.id) {
 			return;
 		}
 
-		API("/article/" + article.id + "/delete", {
+		API(token)("/article/" + article.id + "/delete", {
 			method: "DELETE",
 		})
 			.then((res) => {
@@ -59,7 +61,7 @@ function ShowArticle() {
 	};
 
 	useEffect(() => {
-		API("/article/" + id)
+		API(token)("/article/" + id)
 			.then((res) => {
 				if (!res.success) {
 					console.log(res.message);
@@ -89,41 +91,47 @@ function ShowArticle() {
 				<Container className="px-0 py-4">
 					<section>
 						<Stack>
-                            <Stack direction="horizontal">
-                                <Button variant="outline-secondary" onClick={() => navigate(-1)}>
-                                    <BsArrowLeftShort size={30} />
-                                </Button>
-                            </Stack>
+							<Stack direction="horizontal">
+								<Button variant="outline-secondary" onClick={() => navigate(-1)}>
+									<BsArrowLeftShort size={30} />
+								</Button>
+							</Stack>
 							<Stack
 								direction="horizontal"
 								className="d-flex align-items-center justify-content-center gap-2 text-muted my-4"
 							>
 								<BsClockFill />
 								<span className="text-muted">
-									{article.created_at ? new Date(article.created_at).toLocaleDateString() : null} - by{" "}
+									{article.created_at
+										? new Date(article.created_at).toLocaleDateString()
+										: null}{" "}
+									- by{" "}
 									<Link to={"/user/" + article.author.id}>
 										{article.author.username}
 									</Link>
 								</span>
 							</Stack>
-                            {
-                                article.id === parseInt(id) ? 
-                                <Stack>
-                                    <h1 className="text-center mb-5 pt-1 pb-5">{article.title}</h1>
-                                    <p className="fs-5">{article.content}</p>
-                                    <Stack direction="horizontal" className="flex-wrap gap-2">
-                                        {article.categories.map((category) => {
-                                            return (
-                                                <Badge key={category.id} className="fs-6 bg-secondary">
-                                                    {category.name}
-                                                </Badge>
-                                            );
-                                        })}
-                                    </Stack>
-                                    <hr />
-                                </Stack> :
-                                <Spinner variant="primary" size={10} className="mx-auto my-5" />
-                            }
+							{article.id === parseInt(id) ? (
+								<Stack>
+									<h1 className="text-center mb-5 pt-1 pb-5">{article.title}</h1>
+									<p className="fs-5">{article.content}</p>
+									<Stack direction="horizontal" className="flex-wrap gap-2">
+										{article.categories.map((category) => {
+											return (
+												<Badge
+													key={category.id}
+													className="fs-6 bg-secondary"
+												>
+													{category.name}
+												</Badge>
+											);
+										})}
+									</Stack>
+									<hr />
+								</Stack>
+							) : (
+								<Spinner variant="primary" size={10} className="mx-auto my-5" />
+							)}
 							<Row direction="horizontal">
 								<Col>
 									<Button
@@ -162,7 +170,7 @@ function ShowArticle() {
 									<Button
 										variant="light"
 										className="w-100 d-flex align-items-center justify-content-center gap-1 text-danger"
-                                        onClick={handleDelete}
+										onClick={handleDelete}
 									>
 										<BsTrash />
 										<span>Delete</span>
