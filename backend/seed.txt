@@ -1,6 +1,0 @@
-Categories : {
-    - Health & Wellness
-    - Travel
-    - Technology
-    - Sports
-}

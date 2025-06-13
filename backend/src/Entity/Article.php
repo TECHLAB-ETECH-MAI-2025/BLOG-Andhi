@@ -23,7 +23,7 @@ class Article
     #[Assert\Length(min: 10)]
     private ?string $title = null;
 
-    #[ORM\Column(length: 511)]
+    #[ORM\Column(length: 12799)]
     #[Assert\NotBlank()]
     #[Assert\Length(min: 10)]
     private ?string $content = null;
