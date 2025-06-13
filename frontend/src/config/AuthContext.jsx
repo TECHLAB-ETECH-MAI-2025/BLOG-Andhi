@@ -6,9 +6,9 @@ const AuthContext = createContext();
 const AuthProvider = ({ children }) => {
 	const navigate = useNavigate();
 
-	const token = verifyToken(localStorage.getItem("token"));
+	const tokenDecoded = verifyToken(localStorage.getItem("token"));
 
-	const [user, setUser] = useState(token ? token.user : null);
+	const [user, setUser] = useState(tokenDecoded ? tokenDecoded.user : null);
 
 	const login = (userData, token) => {
 		setUser(userData);

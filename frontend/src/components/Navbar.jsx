@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import {
 	Container,
 	Navbar as BsNavbar,
@@ -11,10 +11,15 @@ import {
 } from "react-bootstrap";
 import { Link } from "react-router";
 import { AuthContext } from "../config/AuthContext";
+import { BsBoxArrowInRight, BsPersonCircle } from "react-icons/bs";
 
 function Navbar() {
-	let { logout } = useContext(AuthContext);
+	let { user, logout } = useContext(AuthContext);
 
+	useEffect(() => {
+		
+	}, [])
+	
 	return (
 		<header>
 			<BsNavbar className=" w-100 position-sticky top-0 navbar-expand-lg navbar-light bg-white">
@@ -53,9 +58,14 @@ function Navbar() {
 									</Link>
 								</NavItem>
 								<NavItem>
-									<Link to={"/login"} className="nav-link">
-										<Button variant="primary" className="rounded-pill px-3" onClick={() => logout()}>
-											<strong>Sign in</strong>
+									<Link to={user ? "/user" : "/login"} className="nav-link">
+										<Button variant="primary" className="d-flex align-items-center gap-2 rounded-pill px-3">
+											{
+												user ?
+												<><BsPersonCircle /> <strong>{user.username}</strong></>
+												:
+												<><BsBoxArrowInRight /> <strong>Sign in</strong></>
+											}
 										</Button>
 									</Link>
 								</NavItem>
