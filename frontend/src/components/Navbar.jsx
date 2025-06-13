@@ -11,7 +11,7 @@ import {
 } from "react-bootstrap";
 import { Link } from "react-router";
 import { AuthContext } from "../config/AuthContext";
-import { BsBoxArrowInRight, BsPersonCircle } from "react-icons/bs";
+import { BsBoxArrowInRight, BsBoxArrowRight, BsPersonCircle } from "react-icons/bs";
 
 function Navbar() {
 	let { user, logout } = useContext(AuthContext);
@@ -47,24 +47,53 @@ function Navbar() {
 						</NavbarToggle>
 						<Nav className="collapse navbar-collapse" id="navbarSupportedContent">
 							<ul className="navbar-nav align-items-center gap-2">
-								<NavItem>
-									<Link to={"/contact"} className="nav-link">
-										Contact
-									</Link>
-								</NavItem>
-								<NavItem>
-									<Link to={"/about"} className="nav-link">
-										About
-									</Link>
-								</NavItem>
+								{
+									user ?
+									<>
+										<NavItem>
+											<Link to={"/articles"} className="nav-link">
+												Articles
+											</Link>
+										</NavItem>
+									</>
+									:
+									<>
+										<NavItem>
+											<Link to={"/contact"} className="nav-link">
+												Contact
+											</Link>
+										</NavItem>
+										<NavItem>
+											<Link to={"/about"} className="nav-link">
+												About
+											</Link>
+										</NavItem>
+									</>
+								}
+								{
+									user &&
+									<NavItem>
+										<Button
+											variant="outline"
+											className="d-flex align-items-center gap-2 rounded-pill"
+											onClick={() => logout()}
+											>
+											<BsBoxArrowRight /> <span>Logout</span>
+										</Button>
+									</NavItem>
+								}
 								<NavItem>
 									<Link to={user ? "/user" : "/login"} className="nav-link">
 										<Button variant="primary" className="d-flex align-items-center gap-2 rounded-pill px-3">
 											{
 												user ?
-												<><BsPersonCircle /> <strong>{user.username}</strong></>
+												<>
+													<BsPersonCircle /> <strong>{user.username}</strong>
+												</>
 												:
-												<><BsBoxArrowInRight /> <strong>Sign in</strong></>
+												<>
+													<BsBoxArrowInRight /> <strong>Sign in</strong>
+												</>
 											}
 										</Button>
 									</Link>
