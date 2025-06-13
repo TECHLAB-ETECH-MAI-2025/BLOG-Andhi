@@ -1,5 +1,4 @@
 import { useContext, useState } from "react";
-import { BsMoonStarsFill } from "react-icons/bs";
 import { Alert, Button, Form, Image } from "react-bootstrap";
 import { Link, useLocation, useNavigate } from "react-router";
 import { upfetch } from "../../config/Up";
@@ -7,7 +6,7 @@ import { AuthContext } from "../../config/AuthContext";
 
 function Login() {
 	const navigate = useNavigate();
-	const { saveToken } = useContext(AuthContext);
+	const { login } = useContext(AuthContext);
 
 	const { state } = useLocation();
 
@@ -73,7 +72,7 @@ function Login() {
 					}));
 					return;
 				}
-				// saveToken(res.token);
+				login(res.data.user, res.data.token);
 				navigate("/article");
 			})
 			.catch((err) => {
@@ -88,7 +87,7 @@ function Login() {
 
 	return (
 		<div className="min-vh-100 d-flex align-items-center justify-content-center">
-			<div className="position-relative bg-light d-flex align-items-stretch text-center rounded-5 shadow-lg overflow-hidden">
+			<div className="bg-light d-flex align-items-stretch text-center rounded-5 shadow-lg overflow-hidden">
 				<div className="w-50 d-flex align-items-center justify-content-center p-4">
 					<div className="w-75 my-5">
 						<h2>Sign in</h2>
@@ -149,11 +148,6 @@ function Login() {
 							</Button>
 						</Link>
 					</div>
-				</div>
-				<div className="position-absolute top-0 start-0 end-0 mt-3">
-					<Button variant="light">
-						<BsMoonStarsFill />
-					</Button>
 				</div>
 			</div>
 		</div>

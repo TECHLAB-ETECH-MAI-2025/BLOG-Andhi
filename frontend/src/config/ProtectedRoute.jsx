@@ -1,17 +1,20 @@
-// import { useContext, useEffect } from "react"
-// import { AuthContext } from "./AuthContext"
-// import { Navigate } from "react-router";
+import { useContext, useEffect } from "react";
+import { AuthContext, verifyToken } from "./AuthContext";
+import { Navigate } from "react-router";
 
-// const ProtectedRoute = () => {
-//     const { token, logout } = useContext(AuthContext);
+const ProtectedRoute = ({ children }) => {
+	const { user, logout } = useContext(AuthContext);
 
-//     useEffect(() => {
-//         const token = sessionStorage.getItem("token") || localStorage.getItem("token");
-//         const decoded = isTokenExpired(token);
-//         if (token && decoded?.isExpired) {
-//             logout();
-//         }
-//         defineRole(decoded?.role);
-//     }, []);
-//     return user ? children : <Navigate to="/login" />;
-// }
+	useEffect(() => {
+		const token = localStorage.getItem("token");
+		const decoded = verifyToken(token);
+		if (token && decoded?.isExpired && !decoded.user) {
+			logout();
+			return;
+		}
+	}, []);
+
+	return user ? children : <Navigate to="/login" />;
+};
+
+export default ProtectedRoute;

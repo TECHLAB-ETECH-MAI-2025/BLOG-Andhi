@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { Alert, Button, Container, Form, Image } from "react-bootstrap";
-import { BsMoonStarsFill } from "react-icons/bs";
+import { Alert, Button, Form, Image } from "react-bootstrap";
 import { Link, useNavigate } from "react-router";
 import { upfetch } from "../../config/Up";
 
@@ -108,7 +107,7 @@ function Register() {
 
 	return (
 		<div className="min-vh-100 d-flex align-items-center justify-content-center">
-			<div className="position-relative bg-light d-flex align-items-stretch text-center rounded-5 shadow-lg overflow-hidden">
+			<div className="bg-light d-flex align-items-stretch text-center rounded-5 shadow-lg overflow-hidden">
 				<div className="w-50 bg-primary d-flex flex-column align-items-center justify-content-around gap-3 text-light py-5">
 					<Link to="/" className="text-light text-decoration-none">
 						<div className="d-flex align-items-center justify-content-between gap-2">
@@ -201,11 +200,6 @@ function Register() {
 							</Button>
 						</Form>
 					</div>
-				</div>
-				<div className="position-absolute top-0 start-0 end-0 mt-3">
-					<Button variant="light">
-						<BsMoonStarsFill />
-					</Button>
 				</div>
 			</div>
 		</div>

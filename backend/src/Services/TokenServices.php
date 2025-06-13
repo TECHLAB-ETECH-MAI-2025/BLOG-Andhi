@@ -23,6 +23,10 @@ class TokenServices {
     }
 
     public static function verifyToken(string $token, ?User $user = null): bool {
+        if (!$token) {
+            return false;
+        }
+
         $tokenVal = explode('.', $token);
         
         $expDate = json_decode(base64_decode($tokenVal[1]), true);

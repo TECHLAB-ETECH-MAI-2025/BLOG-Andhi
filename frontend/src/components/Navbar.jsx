@@ -1,3 +1,4 @@
+import { useContext } from "react";
 import {
 	Container,
 	Navbar as BsNavbar,
@@ -9,8 +10,11 @@ import {
 	NavbarBrand,
 } from "react-bootstrap";
 import { Link } from "react-router";
+import { AuthContext } from "../config/AuthContext";
 
 function Navbar() {
+	let { logout } = useContext(AuthContext);
+
 	return (
 		<header>
 			<BsNavbar className=" w-100 position-sticky top-0 navbar-expand-lg navbar-light bg-white">
@@ -50,7 +54,7 @@ function Navbar() {
 								</NavItem>
 								<NavItem>
 									<Link to={"/login"} className="nav-link">
-										<Button variant="primary" className="rounded-pill px-3">
+										<Button variant="primary" className="rounded-pill px-3" onClick={() => logout()}>
 											<strong>Sign in</strong>
 										</Button>
 									</Link>
