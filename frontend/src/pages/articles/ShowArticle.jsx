@@ -1,9 +1,20 @@
-import { Badge, Button, Card, Col, Container, FloatingLabel, Form, Row, Spinner, Stack } from "react-bootstrap";
+import {
+	Badge,
+	Button,
+	Card,
+	Col,
+	Container,
+	FloatingLabel,
+	Form,
+	Row,
+	Spinner,
+	Stack,
+} from "react-bootstrap";
 import { AuthContext } from "../../config/AuthContext";
 import Navbar from "../../components/Navbar";
 import { Link, useNavigate, useParams } from "react-router";
 import { API } from "../../config/Up";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import {
 	BsArrowLeftShort,
 	BsChatSquareDots,
@@ -17,7 +28,7 @@ import {
 import CommentItem from "../../components/CommentItem";
 
 function ShowArticle() {
-	const { token } = useContext(AuthContext);
+	const { token, user } = useContext(AuthContext);
 	const { id } = useParams();
 	const navigate = useNavigate();
 
@@ -38,13 +49,32 @@ function ShowArticle() {
 	});
 
 	const [articleInfoState, setArticleInfoState] = useState({
+		is_liked: false,
 		like_count: 0,
 		comment_count: 0,
 	});
 
-	const [commentInput, setCommentInput] = useState("")
+	const [commentInput, setCommentInput] = useState("");
 
-	const handleClickLike = () => {};
+	const commentInputRef = useRef();
+
+	const handleClickLike = () => {
+		API(token)("/article/" + article.id + "/like")
+			.then((res) => {
+				if (!res.success) {
+					console.log(res.message);
+					return;
+				}
+				setArticleInfoState((prevState) => ({
+					...prevState,
+					is_liked: res.data.liked,
+					like_count: res.data.like_count,
+				}));
+			})
+			.catch((err) => {
+				console.error(err.message);
+			});
+	};
 
 	const handleDelete = () => {
 		if (!article?.id) {
@@ -75,30 +105,38 @@ function ShowArticle() {
 		API(token)("/comment/" + article.id + "/add", {
 			method: "POST",
 			body: {
-				content: commentInput.trim()
-			}
+				content: commentInput.trim(),
+			},
 		})
-			.then(res => {
+			.then((res) => {
 				if (!res.success) {
 					console.log(res.message);
 					return;
 				}
+
+				window.scrollTo({
+					top: document.documentElement.scrollHeight,
+					behavior: "smooth",
+				});
+
 				let newCommentList = article.comments;
 				newCommentList.push(res.data.comment);
 				setArticle((prevState) => ({
 					...prevState,
-					comments: newCommentList
-				}))
+					comments: newCommentList,
+				}));
+				
 				setArticleInfoState((prevState) => ({
 					...prevState,
-					comment_count: articleInfoState.comment_count++
-				}))
+					comment_count: articleInfoState.comment_count++,
+				}));
+				
 				setCommentInput("");
 			})
-			.catch(err => {
+			.catch((err) => {
 				console.error(err.message);
-			})
-	}
+			});
+	};
 
 	useEffect(() => {
 		API(token)("/article/" + id)
@@ -119,6 +157,11 @@ function ShowArticle() {
 					},
 					categories: res.data.article.categories,
 				}));
+				setArticleInfoState({
+					is_liked: res.data.article.is_liked.includes(user.id),
+					like_count: res.data.article.like_count,
+					comment_count: res.data.article.comment_count,
+				});
 			})
 			.catch((err) => {
 				console.error(err.message);
@@ -144,11 +187,10 @@ function ShowArticle() {
 		if (article.comments) {
 			setArticleInfoState((prevState) => ({
 				...prevState,
-				comment_count: article.comments.length
+				comment_count: article.comments.length,
 			}));
 		}
-	}, [article])
-	
+	}, [article]);
 
 	return (
 		<>
@@ -184,12 +226,14 @@ function ShowArticle() {
 									<Stack direction="horizontal" className="flex-wrap gap-2">
 										{article.categories.map((category) => {
 											return (
-												<Badge
-													key={category.id}
-													className="fs-6 bg-secondary"
-												>
-													{category.name}
-												</Badge>
+												<Link to={"/category/" + category.id}>
+													<Badge
+														key={category.id}
+														className="fs-6 bg-secondary"
+													>
+														{category.name}
+													</Badge>
+												</Link>
 											);
 										})}
 									</Stack>
@@ -201,47 +245,62 @@ function ShowArticle() {
 							<Row>
 								<Col>
 									<Button
-										variant="light"
+										variant={articleInfoState.is_liked ? "danger" : "light"}
 										className="w-100 d-flex align-items-center justify-content-center gap-1"
 										onClick={handleClickLike}
 									>
-										<BsHeart />
-										<span>Like ({articleInfoState.like_count})</span>
+										{articleInfoState.is_liked ? (
+											<BsHeartFill size={20} />
+										) : (
+											<BsHeart size={20} className="text-danger" />
+										)}
+										<span>
+											{articleInfoState.is_liked ? "Liked" : "Like"} (
+											{articleInfoState.like_count})
+										</span>
 									</Button>
 								</Col>
 								<Col>
 									<Button
 										variant="light"
 										className="w-100 d-flex align-items-center justify-content-center gap-1"
+										onClick={() => commentInputRef.current.focus()}
 									>
-										<BsChatSquareDots />
+										<BsChatSquareDots size={20} className="text-success" />
 										<span>Comment ({articleInfoState.comment_count})</span>
 									</Button>
 								</Col>
-								<Col>
-									<Button
-										variant="light"
-										className="w-100 d-flex align-items-center justify-content-center gap-1 text-warning"
-										onClick={() =>
-											navigate("/article/edit/" + article.id, {
-												state: article,
-											})
-										}
-									>
-										<BsPencilSquare />
-										<span>Edit</span>
-									</Button>
-								</Col>
-								<Col>
-									<Button
-										variant="light"
-										className="w-100 d-flex align-items-center justify-content-center gap-1 text-danger"
-										onClick={handleDelete}
-									>
-										<BsTrash />
-										<span>Delete</span>
-									</Button>
-								</Col>
+								{user.id === article.author.id && (
+									<>
+										<Col>
+											<Button
+												variant="light"
+												className="w-100 d-flex align-items-center justify-content-center gap-1"
+												onClick={() =>
+													navigate("/article/edit/" + article.id, {
+														state: article,
+													})
+												}
+											>
+												<BsPencilSquare
+													size={20}
+													className="text-warning"
+												/>
+												<span>Edit</span>
+											</Button>
+										</Col>
+										<Col>
+											<Button
+												variant="light"
+												className="w-100 d-flex align-items-center justify-content-center gap-1"
+												onClick={handleDelete}
+											>
+												<BsTrash size={20} className="text-danger" />
+												<span>Delete</span>
+											</Button>
+										</Col>
+									</>
+								)}
 							</Row>
 						</Stack>
 					</section>
@@ -249,8 +308,12 @@ function ShowArticle() {
 					<section>
 						<Stack className="my-2">
 							<Stack>
-								<Form className="d-flex align-items-start gap-2 my-2" onSubmit={handleSubmitComment}>
+								<Form
+									className="d-flex align-items-start gap-2 my-2"
+									onSubmit={handleSubmitComment}
+								>
 									<Form.Control
+										ref={commentInputRef}
 										as="textarea"
 										name="comment"
 										placeholder="Your comment here..."
@@ -259,14 +322,21 @@ function ShowArticle() {
 										onChange={(e) => setCommentInput(e.target.value)}
 										required={true}
 									/>
-									<Button variant="primary" type="submit" className="rounded-circle d-flex align-items-center">
+									<Button
+										variant="primary"
+										type="submit"
+										className="rounded-circle d-flex align-items-center"
+									>
 										<BsSend size={30} className="mt-2" />
 									</Button>
 								</Form>
 								<div>
-									<h3>Comment{articleInfoState.comment_count > 1 ? "s" : ""} ({articleInfoState.comment_count})</h3>
+									<h3>
+										Comment{articleInfoState.comment_count > 1 ? "s" : ""} (
+										{articleInfoState.comment_count})
+									</h3>
 								</div>
-								<Stack gap={1}>
+								<Stack gap={2}>
 									{article.comments &&
 										article.comments.map((comment, id) => {
 											return <CommentItem key={id} comment={comment} />;

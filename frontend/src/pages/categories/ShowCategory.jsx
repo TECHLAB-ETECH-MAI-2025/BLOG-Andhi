@@ -7,7 +7,7 @@ import { Button, Col, Container, Row, Stack } from "react-bootstrap";
 import { BsArrowLeftShort, BsClockFill, BsPencilSquare, BsTrash } from "react-icons/bs";
 
 function ShowCategory() {
-	const { token } = useContext(AuthContext);
+	const { token, user } = useContext(AuthContext);
 	const { id } = useParams();
 	const navigate = useNavigate();
 
@@ -69,7 +69,9 @@ function ShowCategory() {
 							className="d-flex align-items-center justify-content-center gap-2 text-muted my-4"
 						>
 							<BsClockFill />
-							<span>{new Date(category.created_at).toLocaleDateString()}</span>
+							<span>
+								Created at {new Date(category.created_at).toLocaleDateString()}
+							</span>
 						</Stack>
 						<div className="text-center">
 							<span>Category</span>
@@ -80,32 +82,34 @@ function ShowCategory() {
 							<p>{category.description}</p>
 						</div>
 					</Stack>
-					<Row direction="horizontal">
-						<Col>
-							<Button
-								variant="light"
-								className="w-100 d-flex align-items-center justify-content-center gap-1 text-warning"
-								onClick={() =>
-									navigate("/category/edit/" + category.id, {
-										state: category,
-									})
-								}
-							>
-								<BsPencilSquare />
-								<span>Edit</span>
-							</Button>
-						</Col>
-						<Col>
-							<Button
-								variant="light"
-								className="w-100 d-flex align-items-center justify-content-center gap-1 text-danger"
-								onClick={handleDelete}
-							>
-								<BsTrash />
-								<span>Delete</span>
-							</Button>
-						</Col>
-					</Row>
+					{user.roles.includes("ROLE_ADMIN") && (
+						<Row direction="horizontal">
+							<Col>
+								<Button
+									variant="light"
+									className="w-100 d-flex align-items-center justify-content-center gap-1"
+									onClick={() =>
+										navigate("/category/edit/" + category.id, {
+											state: category,
+										})
+									}
+								>
+									<BsPencilSquare size={20} className="text-warning" />
+									<span>Edit</span>
+								</Button>
+							</Col>
+							<Col>
+								<Button
+									variant="light"
+									className="w-100 d-flex align-items-center justify-content-center gap-1"
+									onClick={handleDelete}
+								>
+									<BsTrash size={20} className="text-danger" />
+									<span>Delete</span>
+								</Button>
+							</Col>
+						</Row>
+					)}
 				</Container>
 			</main>
 		</>

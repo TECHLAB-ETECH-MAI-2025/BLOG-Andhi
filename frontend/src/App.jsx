@@ -8,6 +8,7 @@ import Auth from "./pages/auth/Auth";
 import Article from "./pages/articles/Article";
 import User from "./pages/user/User";
 import Category from "./pages/categories/Category";
+import Chat from "./pages/chat/Chat";
 
 function App() {
 	const routes = [
@@ -36,6 +37,8 @@ function App() {
 		{ path: "category/new", element: <Category.NewOrEditCategory newOrEdit="NEW_CATEGORY" />, public: false },
 		{ path: "category/edit/:id", element: <Category.NewOrEditCategory newOrEdit="EDIT_CATEGORY" />, public: false },
 
+		// Chat page
+		{ path: "chat", element: <Chat.IndexChat />, public: false },
 	];
 	return (
 		<BrowserRouter>

@@ -5,8 +5,10 @@ namespace App\Controller\Api;
 use App\DTO\ArticleDTO;
 use App\DTO\CategoryDTO;
 use App\Entity\Article;
+use App\Entity\ArticleLike;
 use App\Entity\Category;
 use App\Entity\User;
+use App\Repository\ArticleLikeRepository;
 use App\Repository\ArticleRepository;
 use App\Repository\UserRepository;
 use App\Services\TokenServices;
@@ -27,7 +29,7 @@ class ArticleController extends ApiController
     ): JsonResponse {
         try {
             $token = TokenServices::verifyToken($request->headers->get('Authorization'), $userRepository);
-            
+
             if (!$token['isValid']) {
                 return $this->error('Unauthorized request');
             }
@@ -51,12 +53,14 @@ class ArticleController extends ApiController
                 $resArticle->created_at = $article->getCreatedAt();
                 $resArticle->author_id = $article->getAuthor()->getId();
                 $resArticle->author_username = $article->getAuthor()->getUsername();
-                $resArticle->categories = array_map(function ($articleCategory) {
+                $resArticle->categories = array_map(function (Category $articleCategory) {
                     $resCategory = new CategoryDTO();
                     $resCategory->id = $articleCategory->getId();
                     $resCategory->name = $articleCategory->getName();
                     return $resCategory;
                 }, $article->getCategories()->toArray());
+                $resArticle->like_count = $article->getLikes()->count();
+                $resArticle->comment_count = $article->getComments()->count();
 
                 $resArticles[] = $resArticle;
             }
@@ -78,7 +82,7 @@ class ArticleController extends ApiController
     ): JsonResponse {
         try {
             $token = TokenServices::verifyToken($request->headers->get('Authorization'), $userRepository);
-            
+
             if (!$token['isValid']) {
                 return $this->error('Unauthorized request');
             }
@@ -139,7 +143,7 @@ class ArticleController extends ApiController
             $resArticle->created_at = $article->getCreatedAt();
             $resArticle->author_id = $article->getAuthor()->getId();
             $resArticle->author_username = $article->getAuthor()->getUsername();
-            $resArticle->categories = array_map(function ($articleCategory) {
+            $resArticle->categories = array_map(function (Category $articleCategory) {
                 $resCategory = new CategoryDTO();
                 $resCategory->id = $articleCategory->getId();
                 $resCategory->name = $articleCategory->getName();
@@ -163,7 +167,7 @@ class ArticleController extends ApiController
     ): JsonResponse {
         try {
             $token = TokenServices::verifyToken($request->headers->get('Authorization'), $userRepository);
-            
+
             if (!$token['isValid']) {
                 return $this->error('Unauthorized request');
             }
@@ -181,12 +185,17 @@ class ArticleController extends ApiController
             $resArticle->created_at = $article->getCreatedAt();
             $resArticle->author_id = $article->getAuthor()->getId();
             $resArticle->author_username = $article->getAuthor()->getUsername();
-            $resArticle->categories = array_map(function ($articleCategory) {
+            $resArticle->categories = array_map(function (Category $articleCategory) {
                 $resCategory = new CategoryDTO();
                 $resCategory->id = $articleCategory->getId();
                 $resCategory->name = $articleCategory->getName();
                 return $resCategory;
             }, $article->getCategories()->toArray());
+            $resArticle->like_count = $article->getLikes()->count();
+            $resArticle->comment_count = $article->getComments()->count();
+            $resArticle->is_liked = array_map(function (ArticleLike $like) {
+                return $like->getUser()->getId();
+            }, $article->getLikes()->toArray());
 
             return $this->success([
                 'article' => $resArticle
@@ -206,7 +215,7 @@ class ArticleController extends ApiController
     ): JsonResponse {
         try {
             $token = TokenServices::verifyToken($request->headers->get('Authorization'), $userRepository);
-            
+
             if (!$token['isValid']) {
                 return $this->error('Unauthorized request');
             }
@@ -262,7 +271,7 @@ class ArticleController extends ApiController
             $resArticle->created_at = $article->getCreatedAt();
             $resArticle->author_id = $article->getAuthor()->getId();
             $resArticle->author_username = $article->getAuthor()->getUsername();
-            $resArticle->categories = array_map(function ($articleCategory) {
+            $resArticle->categories = array_map(function (Category $articleCategory) {
                 $resCategory = new CategoryDTO();
                 $resCategory->id = $articleCategory->getId();
                 $resCategory->name = $articleCategory->getName();
@@ -287,7 +296,7 @@ class ArticleController extends ApiController
     ): JsonResponse {
         try {
             $token = TokenServices::verifyToken($request->headers->get('Authorization'), $userRepository);
-            
+
             if (!$token['isValid']) {
                 return $this->error('Unauthorized request');
             }
@@ -317,7 +326,7 @@ class ArticleController extends ApiController
     {
         try {
             $token = TokenServices::verifyToken($request->headers->get('Authorization'));
-            
+
             if (!$token['isValid']) {
                 return $this->error('Unauthorized request');
             }
@@ -346,7 +355,7 @@ class ArticleController extends ApiController
                 $resArticle->created_at = $article->getCreatedAt();
                 $resArticle->author_id = $article->getAuthor()->getId();
                 $resArticle->author_username = $article->getAuthor()->getUsername();
-                $resArticle->categories = array_map(function ($articleCategory) {
+                $resArticle->categories = array_map(function (Category $articleCategory) {
                     $resCategory = new CategoryDTO();
                     $resCategory->id = $articleCategory->getId();
                     $resCategory->name = $articleCategory->getName();
@@ -369,11 +378,11 @@ class ArticleController extends ApiController
     {
         try {
             $token = TokenServices::verifyToken($request->headers->get('Authorization'));
-            
+
             if (!$token['isValid']) {
                 return $this->error('Unauthorized request');
             }
-            
+
             $data = $articleRepository->getArticleByUser($id);
 
             if (count($data) === 0) {
@@ -392,7 +401,7 @@ class ArticleController extends ApiController
                 $resArticle->created_at = $article->getCreatedAt();
                 $resArticle->author_id = $article->getAuthor()->getId();
                 $resArticle->author_username = $article->getAuthor()->getUsername();
-                $resArticle->categories = array_map(function ($articleCategory) {
+                $resArticle->categories = array_map(function (Category $articleCategory) {
                     $resCategory = new CategoryDTO();
                     $resCategory->id = $articleCategory->getId();
                     $resCategory->name = $articleCategory->getName();
@@ -405,6 +414,55 @@ class ArticleController extends ApiController
             return $this->success([
                 'articles' => $resArticles
             ]);
+        } catch (\Throwable $th) {
+            return $this->error($th->getMessage());
+        }
+    }
+
+    #[Route('/article/{id}/like')]
+    public function likeArticle(
+        Article $article,
+        Request $request,
+        EntityManagerInterface $entityManager,
+        ArticleLikeRepository $likeRepository,
+        UserRepository $userRepository
+    ): JsonResponse {
+        try {
+            $token = TokenServices::verifyToken($request->headers->get('Authorization'), $userRepository);
+
+            if (!$token['isValid']) {
+                return $this->error('Unauthorized request');
+            }
+
+            $user = $token['user'];
+
+            $existingLike = $likeRepository->findOneBy([
+                'article' => $article,
+                'user' => $user
+            ]);
+
+            if ($existingLike) {
+                $entityManager->remove($existingLike);
+                $entityManager->flush();
+
+                return $this->success([
+                    'liked' => false,
+                    'like_count' => $article->getLikes()->count()
+                ]);
+            } else {
+                $like = new ArticleLike();
+                $like->setArticle($article);
+                $like->setUser($user);
+                $like->setCreatedAt(new \DateTimeImmutable());
+
+                $entityManager->persist($like);
+                $entityManager->flush();
+
+                return $this->success([
+                    'liked' => true,
+                    'like_count' => $article->getLikes()->count()
+                ]);
+            }
         } catch (\Throwable $th) {
             return $this->error($th->getMessage());
         }

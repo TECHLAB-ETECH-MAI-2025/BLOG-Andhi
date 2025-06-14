@@ -10,4 +10,7 @@ class ArticleDTO {
     public int $author_id;
     public string $author_username;
     public array $categories;
+    public array $is_liked;
+    public int $like_count;
+    public int $comment_count;
 }

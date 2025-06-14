@@ -34,10 +34,10 @@ function ArticleCard({ article, isRecent = true }) {
                 <Row>
                     <Col className="d-flex align-items-center justify-content-end gap-4">
                         <div className="align-items-center gap-1">
-                            <BsHeartFill /> <span>4</span>
+                            <BsHeartFill /> <span>{article.like_count}</span>
                         </div>
                         <div className="align-items-center gap-1">
-                            <BsChatSquareDotsFill /> <span>4</span>
+                            <BsChatSquareDotsFill /> <span>{article.comment_count}</span>
                         </div>
                     </Col>
                 </Row>
