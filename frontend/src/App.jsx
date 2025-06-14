@@ -39,6 +39,7 @@ function App() {
 
 		// Chat page
 		{ path: "chat", element: <Chat.IndexChat />, public: false },
+		{ path: "chat/:id", element: <Chat.ShowChat />, public: false },
 	];
 	return (
 		<BrowserRouter>
