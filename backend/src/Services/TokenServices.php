@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\DTO\UserDTO;
 use App\Entity\User;
+use App\Repository\UserRepository;
 
 class TokenServices {
     public static function createToken(User $user): string {
@@ -22,9 +24,11 @@ class TokenServices {
         return $payload.'.'.$expDate;
     }
 
-    public static function verifyToken(string $token, ?User $user = null): bool {
-        if (!$token) {
-            return false;
+    public static function verifyToken(string $token, ?UserRepository $userRepository = null): array {
+        if (!$token && !$userRepository) {
+            return [
+                'isValid' => false
+            ];
         }
 
         $tokenVal = explode('.', $token);
@@ -32,17 +36,30 @@ class TokenServices {
         $expDate = json_decode(base64_decode($tokenVal[1]), true);
         
         if ($expDate['expDate'] < time()) {
-            return false;
+            return [
+                'isValid' => false
+            ];
         }
 
-        if ($user) {
-            $payload = json_decode(base64_decode($tokenVal[0]), true);
-    
-            if ($payload['email'] !== $user->getEmail() && $payload['roles'] !== $user->getRoles()) {
-                return false;
-            }
+        if (!$userRepository) {
+            return [
+                'isValid' => true
+            ];
         }
 
-        return true;
+        $payload = json_decode(base64_decode($tokenVal[0]), true);
+
+        $user = $userRepository->find($payload['id']);
+
+        if ($payload['email'] !== $user->getEmail() && $payload['roles'] !== $user->getRoles()) {
+            return [
+                'isValid' => false
+            ];
+        }
+
+        return [
+            'user' => $user,
+            'isValid' => true
+        ];
     }
 }

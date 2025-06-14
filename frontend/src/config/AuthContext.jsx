@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useState } from "react";
 import { useNavigate } from "react-router";
 
 const AuthContext = createContext();
@@ -6,13 +6,15 @@ const AuthContext = createContext();
 const AuthProvider = ({ children }) => {
 	const navigate = useNavigate();
 
-	const tokenDecoded = verifyToken(localStorage.getItem("token"));
+	const token = localStorage.getItem("token");
+
+	const tokenDecoded = verifyToken(token);
 
 	const [user, setUser] = useState(tokenDecoded ? tokenDecoded.user : null);
 
-	const login = (userData, token) => {
+	const login = (userData, userToken) => {
 		setUser(userData);
-		localStorage.setItem("token", token);
+		localStorage.setItem("token", userToken);
 	};
 
 	// remove token, and set user to null on logout
@@ -23,7 +25,7 @@ const AuthProvider = ({ children }) => {
 	};
 
 	return (
-		<AuthContext.Provider value={{ user, setUser, login, logout }}>
+		<AuthContext.Provider value={{ token, user, setUser, login, logout }}>
 			{children}
 		</AuthContext.Provider>
 	);

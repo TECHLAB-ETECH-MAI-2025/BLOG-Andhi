@@ -99,7 +99,7 @@ class ArticleRepository extends ServiceEntityRepository
     }
 
     /**
-     * Recherche des articles par titre
+     * Search article by title
      */
     public function searchByTitle(string $query, int $limit = 10): array
     {
@@ -109,6 +109,21 @@ class ArticleRepository extends ServiceEntityRepository
             ->setParameter('query', '%' . $query . '%')
             ->orderBy('a.createdAt', 'DESC')
             ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Get article by title
+     */
+    public function getArticleByUser(string $userId): array
+    {
+        return $this->createQueryBuilder('a')
+            ->leftJoin('a.categories', 'c')
+            ->where('a.author = :author')
+            ->setParameter('author', $userId)
+            ->orderBy('a.createdAt', 'DESC')
+            ->setMaxResults(10)
             ->getQuery()
             ->getResult();
     }

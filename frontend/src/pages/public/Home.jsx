@@ -1,17 +1,20 @@
+import { useContext } from "react";
+import { Link } from "react-router";
 import { Button, Card, Col, Container, Row } from "react-bootstrap";
+import { AuthContext } from "../../config/AuthContext";
 import Navbar from "../../components/Navbar";
 import { BsChatSquareDotsFill, BsClockFill, BsHeartFill } from "react-icons/bs";
-import { Link } from "react-router";
 
 function Home() {
+	const { user } = useContext(AuthContext);
 	return (
 		<>
-				<Navbar />
+			<Navbar />
 			<main>
 				<div className="vh-100 d-flex align-items-center">
 					<Container className="h-100 d-flex flex-column">
-						<div className="flex-grow-1 d-flex align-items-center gap-5 mt-5 pt-5">
-							<div className="w-75 d-flex flex-column gap-2 py-5">
+						<div className="flex-grow-1 d-flex align-items-center gap-5">
+							<div className="w-75 d-flex flex-column gap-2">
 								<span>
 									<strong>
 										<span className="fs-4">Daily room,</span>
@@ -24,13 +27,13 @@ function Home() {
 									Consequuntur deleniti ipsa, officiis pariatur, eius at mollitia
 									fuga veniam, non esse voluptas eveniet enim numquam doloribus!
 								</p>
-								<Link to="/register" className="mt-1">
+								<Link to={user ? "/article" : "/register"} className="mt-1">
 									<Button variant="primary" className="rounded-pill px-3">
-										Get started
+										{ user ? "See the most related article" : "Get started"}
 									</Button>
 								</Link>
 							</div>
-							<div className="w-50 d-flex flex-column gap-2 py-5">
+							<div className="w-50 d-flex flex-column gap-2">
 								<div className="bg-primary text-light rounded-5 p-5">
 									<strong className="fs-2">Hello, world</strong>
 									<hr />

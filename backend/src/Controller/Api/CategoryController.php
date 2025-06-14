@@ -6,6 +6,8 @@ use App\DTO\ArticleDTO;
 use App\DTO\CategoryDTO;
 use App\Entity\Category;
 use App\Repository\CategoryRepository;
+use App\Repository\UserRepository;
+use App\Services\TokenServices;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -17,9 +19,16 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class CategoryController extends ApiController
 {
     #[Route('/categories', methods: ['GET'])]
-    public function index(CategoryRepository $categoryRepository): JsonResponse
-    {
+    public function index(
+        Request $request,
+        CategoryRepository $categoryRepository
+    ): JsonResponse {
         try {
+            $token = TokenServices::verifyToken($request->headers->get('Authorization'));
+            
+            if (!$token['isValid']) {
+                return $this->error('Unauthenticated');
+            }
             // $reqPage = $request->query->getInt('page');
             $data = $categoryRepository->findAll();
 
@@ -55,9 +64,20 @@ class CategoryController extends ApiController
     public function create(
         Request $request,
         ValidatorInterface $validator,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        UserRepository $userRepository
     ): JsonResponse {
         try {
+            $token = TokenServices::verifyToken($request->headers->get('Authorization'), $userRepository);
+            
+            if (!$token['isValid']) {
+                return $this->error('Unauthorized request');
+            }
+
+            if (!in_array('ROLE_ADMIN', $token['user']->getRoles())) {
+                return $this->error('Forbidden request');
+            }
+
             $data = json_decode($request->getContent(), true);
 
             $reqName = $data['name'] ?? null;
@@ -91,9 +111,15 @@ class CategoryController extends ApiController
 
     #[Route('/category/{id}', methods: ['GET'])]
     // #[IsGranted('IS_AUTHENTICATED_FULLY')]
-    public function show(int $id, CategoryRepository $categoryRepository): JsonResponse
+    public function show(int $id, Request $request, CategoryRepository $categoryRepository): JsonResponse
     {
         try {
+            $token = TokenServices::verifyToken($request->headers->get('Authorization'));
+            
+            if (!$token['isValid']) {
+                return $this->error('Unauthorized request');
+            }
+
             $category = $categoryRepository->find($id);
 
             if (!$category) {
@@ -131,9 +157,20 @@ class CategoryController extends ApiController
         int $id,
         CategoryRepository $categoryRepository,
         Request $request,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        UserRepository $userRepository
     ): JsonResponse {
         try {
+            $token = TokenServices::verifyToken($request->headers->get('Authorization'), $userRepository);
+            
+            if (!$token['isValid']) {
+                return $this->error('Unauthorized request');
+            }
+
+            if (!in_array('ROLE_ADMIN', $token['user']->getRoles())) {
+                return $this->error('Forbidden request');
+            }
+
             $category = $categoryRepository->find($id);
 
             if (!$category) {
@@ -175,9 +212,19 @@ class CategoryController extends ApiController
 
     #[Route('/category/{id}/delete', methods: ['DELETE'])]
     // #[IsGranted('ROLE_ADMIN')]
-    public function delete(int $id, CategoryRepository $categoryRepository, EntityManagerInterface $entityManager): JsonResponse
+    public function delete(int $id, Request $request, CategoryRepository $categoryRepository, EntityManagerInterface $entityManager, UserRepository $userRepository): JsonResponse
     {
         try {
+            $token = TokenServices::verifyToken($request->headers->get('Authorization'), $userRepository);
+            
+            if (!$token['isValid']) {
+                return $this->error('Unauthorized request');
+            }
+
+            if (!in_array('ROLE_ADMIN', $token['user']->getRoles())) {
+                return $this->error('Forbidden request');
+            }
+
             $category = $categoryRepository->findOneBy(['id' => $id]);
 
             if (!$category) {
@@ -188,6 +235,48 @@ class CategoryController extends ApiController
             $entityManager->flush();
 
             return $this->success(null, 'Category "' . $category->getName() . '" is deleted successfully', 204);
+        } catch (\Throwable $th) {
+            return $this->error($th->getMessage());
+        }
+    }
+
+    #[Route('/categories/search', methods: ['GET'])]
+    public function searchCategory(Request $request, CategoryRepository $categoryRepository): JsonResponse
+    {
+        try {
+            if (!TokenServices::verifyToken($request->headers->get('Authorization'))) {
+                return $this->error('Forbidden request');
+            }
+            
+            $query = $request->query->get('s', '');
+
+            if (strlen($query) < 2) {
+                return $this->error('Invalid query parameter');
+            }
+
+            $data = $categoryRepository->searchByName($query);
+
+            if (count($data) === 0) {
+                return $this->success([
+                    'categories' => []
+                ], 'Empty category list');
+            }
+
+            $resCategories = [];
+
+            foreach ($data as $category) {
+                $resCategory = new CategoryDTO();
+                $resCategory->id = $category->getId();
+                $resCategory->name = $category->getName();
+                $resCategory->description = $category->getDescription();
+                $resCategory->created_at = $category->getCreatedAt();
+
+                $resCategories[] = $resCategory;
+            }
+
+            return $this->success([
+                'categories' => $resCategories
+            ]);
         } catch (\Throwable $th) {
             return $this->error($th->getMessage());
         }

@@ -15,14 +15,10 @@ import { BsBoxArrowInRight, BsBoxArrowRight, BsPersonCircle } from "react-icons/
 
 function Navbar() {
 	let { user, logout } = useContext(AuthContext);
-
-	useEffect(() => {
-		
-	}, [])
 	
 	return (
 		<header>
-			<BsNavbar className=" w-100 position-sticky top-0 navbar-expand-lg navbar-light bg-white">
+			<BsNavbar className="w-100 position-fixed top-0 navbar-expand-lg navbar-light bg-white shadow-sm" style={{ zIndex: 99}}>
 				<Container className="d-flex align-items-center justify-content-between px-0">
 					<NavbarBrand className="d-flex gap-4 py-1">
 						<Link to="/" className="text-decoration-none">
@@ -51,10 +47,20 @@ function Navbar() {
 									user ?
 									<>
 										<NavItem>
-											<Link to={"/articles"} className="nav-link">
+											<Link to={"/article"} className="nav-link">
 												Articles
 											</Link>
 										</NavItem>
+										{
+											user.roles && (
+												user.roles.includes("ROLE_ADMIN") &&
+												<NavItem>
+													<Link to={"/category 	"} className="nav-link">
+														Categories
+													</Link>
+												</NavItem>
+											)
+										}
 									</>
 									:
 									<>
@@ -83,7 +89,7 @@ function Navbar() {
 									</NavItem>
 								}
 								<NavItem>
-									<Link to={user ? "/user" : "/login"} className="nav-link">
+									<Link to={user ? "/user/" + user.id : "/login"} className="nav-link">
 										<Button variant="primary" className="d-flex align-items-center gap-2 rounded-pill px-3">
 											{
 												user ?

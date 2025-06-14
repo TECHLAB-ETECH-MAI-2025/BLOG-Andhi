@@ -8,6 +8,7 @@ use App\Entity\Article;
 use App\Entity\Category;
 use App\Entity\User;
 use App\Repository\ArticleRepository;
+use App\Repository\UserRepository;
 use App\Services\TokenServices;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -19,22 +20,28 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class ArticleController extends ApiController
 {
     #[Route('/articles', methods: ['GET'])]
-    public function index(Request $request, ArticleRepository $articleRepository): JsonResponse
-    {
+    public function index(
+        Request $request,
+        ArticleRepository $articleRepository,
+        UserRepository $userRepository
+    ): JsonResponse {
         try {
-            // if (!TokenServices::verifyToken($request->headers->get('Authorization'))) {
-            //     return $this->error('Forbidden request');
-            // }
+            $token = TokenServices::verifyToken($request->headers->get('Authorization'), $userRepository);
+            
+            if (!$token['isValid']) {
+                return $this->error('Unauthorized request');
+            }
+
             // $reqPage = $request->query->getInt('page');
             $data = $articleRepository->findAll();
-            
+
             if (count($data) === 0) {
                 return $this->success([
                     'articles' => []
                 ], 'Empty article list');
             }
-            
-            $resCategories = [];
+
+            $resArticles = [];
 
             foreach ($data as $article) {
                 $resArticle = new ArticleDTO();
@@ -51,11 +58,11 @@ class ArticleController extends ApiController
                     return $resCategory;
                 }, $article->getCategories()->toArray());
 
-                $resCategories[] = $resArticle;
+                $resArticles[] = $resArticle;
             }
 
             return $this->success([
-                'articles' => $resCategories
+                'articles' => $resArticles
             ]);
         } catch (\Throwable $th) {
             return $this->error($th->getMessage());
@@ -66,22 +73,24 @@ class ArticleController extends ApiController
     public function create(
         Request $request,
         ValidatorInterface $validator,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        UserRepository $userRepository
     ): JsonResponse {
         try {
+            $token = TokenServices::verifyToken($request->headers->get('Authorization'), $userRepository);
+            
+            if (!$token['isValid']) {
+                return $this->error('Unauthorized request');
+            }
+
             $data = json_decode($request->getContent(), true);
 
             $reqTitle = $data['title'] ?? null;
             $reqContent = $data['content'] ?? null;
-            $reqUserId = $data['user_id'] ?? null;
             $reqCategories = $data['categories'] ?? []; // all seleted category_id
 
             if (!$reqTitle && !$reqContent) {
                 return $this->error('Empty input: title and content are required');
-            }
-
-            if (!$reqUserId) {
-                return $this->error('Invalid user_id');
             }
 
             if (empty($data['categories'])) {
@@ -105,7 +114,7 @@ class ArticleController extends ApiController
                 return $this->error('Invalid categories');
             }
 
-            $user = $entityManager->getRepository(User::class)->find($reqUserId);
+            $user = $entityManager->getRepository(User::class)->find($token['user']->getId());
 
             if (!$user) {
                 return $this->error('Invalid user');
@@ -146,9 +155,19 @@ class ArticleController extends ApiController
     }
 
     #[Route('/article/{id}', methods: ['GET'])]
-    public function show(int $id, ArticleRepository $articleRepository): JsonResponse
-    {
+    public function show(
+        int $id,
+        Request $request,
+        ArticleRepository $articleRepository,
+        UserRepository $userRepository
+    ): JsonResponse {
         try {
+            $token = TokenServices::verifyToken($request->headers->get('Authorization'), $userRepository);
+            
+            if (!$token['isValid']) {
+                return $this->error('Unauthorized request');
+            }
+
             $article = $articleRepository->find($id);
 
             if (!$article) {
@@ -182,20 +201,26 @@ class ArticleController extends ApiController
         int $id,
         ArticleRepository $articleRepository,
         Request $request,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        UserRepository $userRepository
     ): JsonResponse {
         try {
+            $token = TokenServices::verifyToken($request->headers->get('Authorization'), $userRepository);
+            
+            if (!$token['isValid']) {
+                return $this->error('Unauthorized request');
+            }
+
             $article = $articleRepository->find($id);
 
             if (!$article) {
                 return $this->error('Article not found');
             }
 
-            // $user = $this->getUser();
-
-            // if ($article->getAuthor() !== $user) {
-            //     return $this->error('Unauthorized request');
-            // }
+            $user = $token['user'];
+            if ($article->getAuthor() !== $user) {
+                return $this->error('Forbidden request');
+            }
 
             $data = json_decode($request->getContent(), true);
 
@@ -253,23 +278,133 @@ class ArticleController extends ApiController
     }
 
     #[Route('/article/{id}/delete', methods: ['DELETE'])]
-    public function delete(int $id, ArticleRepository $articleRepository, EntityManagerInterface $entityManager): JsonResponse
-    {
+    public function delete(
+        int $id,
+        Request $request,
+        ArticleRepository $articleRepository,
+        EntityManagerInterface $entityManager,
+        UserRepository $userRepository
+    ): JsonResponse {
         try {
+            $token = TokenServices::verifyToken($request->headers->get('Authorization'), $userRepository);
+            
+            if (!$token['isValid']) {
+                return $this->error('Unauthorized request');
+            }
+
             $article = $articleRepository->find($id);
 
             if (!$article) {
                 return $this->error('Article not found');
             }
 
-            if ($article->getAuthor() !== $this->getUser()) {
-                return $this->error('Unauthorized request');
+            $user = $token['user'];
+            if ($article->getAuthor() !== $user) {
+                return $this->error('Forbidden request');
             }
 
             $entityManager->remove($article);
             $entityManager->flush();
 
             return $this->success(null, 'Article "' . $article->getId() . '" is deleted successfully', 204);
+        } catch (\Throwable $th) {
+            return $this->error($th->getMessage());
+        }
+    }
+
+    #[Route('/articles/search', methods: ['GET'])]
+    public function searchArticles(Request $request, ArticleRepository $articleRepository): JsonResponse
+    {
+        try {
+            $token = TokenServices::verifyToken($request->headers->get('Authorization'));
+            
+            if (!$token['isValid']) {
+                return $this->error('Unauthorized request');
+            }
+
+            $query = $request->query->get('s', '');
+
+            if (strlen($query) < 2) {
+                return $this->error('Invalid query parameter');
+            }
+
+            $data = $articleRepository->searchByTitle($query, 10);
+
+            if (count($data) === 0) {
+                return $this->success([
+                    'articles' => []
+                ], 'Empty article list');
+            }
+
+            $resCategories = [];
+
+            foreach ($data as $article) {
+                $resArticle = new ArticleDTO();
+                $resArticle->id = $article->getId();
+                $resArticle->title = $article->getTitle();
+                $resArticle->content = $article->getContent();
+                $resArticle->created_at = $article->getCreatedAt();
+                $resArticle->author_id = $article->getAuthor()->getId();
+                $resArticle->author_username = $article->getAuthor()->getUsername();
+                $resArticle->categories = array_map(function ($articleCategory) {
+                    $resCategory = new CategoryDTO();
+                    $resCategory->id = $articleCategory->getId();
+                    $resCategory->name = $articleCategory->getName();
+                    return $resCategory;
+                }, $article->getCategories()->toArray());
+
+                $resCategories[] = $resArticle;
+            }
+
+            return $this->success([
+                'articles' => $resCategories
+            ]);
+        } catch (\Throwable $th) {
+            return $this->error($th->getMessage());
+        }
+    }
+
+    #[Route('/article/user/{id}', methods: ['GET'])]
+    public function articleByUser(int $id, Request $request, ArticleRepository $articleRepository): JsonResponse
+    {
+        try {
+            $token = TokenServices::verifyToken($request->headers->get('Authorization'));
+            
+            if (!$token['isValid']) {
+                return $this->error('Unauthorized request');
+            }
+            
+            $data = $articleRepository->getArticleByUser($id);
+
+            if (count($data) === 0) {
+                return $this->success([
+                    'articles' => []
+                ], 'Empty article list');
+            }
+
+            $resArticles = [];
+
+            foreach ($data as $article) {
+                $resArticle = new ArticleDTO();
+                $resArticle->id = $article->getId();
+                $resArticle->title = $article->getTitle();
+                $resArticle->content = $article->getContent();
+                $resArticle->created_at = $article->getCreatedAt();
+                $resArticle->author_id = $article->getAuthor()->getId();
+                $resArticle->author_username = $article->getAuthor()->getUsername();
+                $resArticle->categories = array_map(function ($articleCategory) {
+                    $resCategory = new CategoryDTO();
+                    $resCategory->id = $articleCategory->getId();
+                    $resCategory->name = $articleCategory->getName();
+                    return $resCategory;
+                }, $article->getCategories()->toArray());
+
+                $resArticles[] = $resArticle;
+            }
+
+            return $this->success([
+                'articles' => $resArticles
+            ]);
         } catch (\Throwable $th) {
             return $this->error($th->getMessage());
         }

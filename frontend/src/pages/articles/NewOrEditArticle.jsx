@@ -1,3 +1,4 @@
+import { useContext, useEffect, useState } from "react";
 import { Alert, Button, Col, Container, FloatingLabel, Form, Row, Stack } from "react-bootstrap";
 import Navbar from "../../components/Navbar";
 import {
@@ -9,10 +10,9 @@ import {
 	BsClockFill,
 	BsTrash,
 } from "react-icons/bs";
-import { useContext, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router";
-import { API } from "../../config/Up";
 import { AuthContext } from "../../config/AuthContext";
+import { API } from "../../config/Up";
 
 const NEW_ARTICLE = "NEW_ARTICLE";
 const EDIT_ARTICLE = "EDIT_ARTICLE";
@@ -181,14 +181,6 @@ function NewOrEditArticle({ newOrEdit = NEW_ARTICLE }) {
 			method: "DELETE",
 		})
 			.then((res) => {
-				if (!res.success) {
-					setValidForm((prevState) => ({
-						...prevState,
-						isValid: false,
-						message: res.message,
-					}));
-					return;
-				}
 				setValidForm((prevState) => ({
 					...prevState,
 					isValid: false,
@@ -255,7 +247,7 @@ function NewOrEditArticle({ newOrEdit = NEW_ARTICLE }) {
 						<Button variant="outline-secondary" onClick={() => navigate(-1)}>
 							<BsArrowLeftShort size={30} />
 						</Button>
-						<h1>{newOrEdit === NEW_ARTICLE ? "New" : "Edit"} article</h1>
+						<h1>{newOrEdit === NEW_ARTICLE ? "Create an" : "Edit"} article</h1>
 					</Stack>
 					<Stack direction="horizontal" className="align-items-start gap-5">
 						<Form

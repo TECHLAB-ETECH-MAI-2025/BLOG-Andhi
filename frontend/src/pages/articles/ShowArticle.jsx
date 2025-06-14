@@ -101,7 +101,7 @@ function ShowArticle() {
 								className="d-flex align-items-center justify-content-center gap-2 text-muted my-4"
 							>
 								<BsClockFill />
-								<span className="text-muted">
+								<span>
 									{article.created_at
 										? new Date(article.created_at).toLocaleDateString()
 										: null}{" "}
