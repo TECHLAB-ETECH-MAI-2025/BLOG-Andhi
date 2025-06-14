@@ -226,9 +226,8 @@ function ShowArticle() {
 									<Stack direction="horizontal" className="flex-wrap gap-2">
 										{article.categories.map((category) => {
 											return (
-												<Link to={"/category/" + category.id}>
+												<Link key={category.id} to={"/category/" + category.id}>
 													<Badge
-														key={category.id}
 														className="fs-6 bg-secondary"
 													>
 														{category.name}

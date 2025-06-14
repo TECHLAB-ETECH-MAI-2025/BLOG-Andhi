@@ -61,6 +61,11 @@ function Navbar() {
 												</NavItem>
 											)
 										}
+										<NavItem>
+											<Link to={"/chat"} className="nav-link">
+												Chat
+											</Link>
+										</NavItem>
 									</>
 									:
 									<>

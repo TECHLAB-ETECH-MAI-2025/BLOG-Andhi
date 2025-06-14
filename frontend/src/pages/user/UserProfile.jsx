@@ -27,7 +27,7 @@ function UserProfile() {
 			return;
 		}
 
-		API(token)("/user/" + id)
+		API(token)("/user/" + (id ?? user.id))
 			.then((res) => {
 				if (!res.success) {
 					console.log(res.message);
