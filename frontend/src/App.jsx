@@ -22,6 +22,7 @@ function App() {
 
 		// User page
 		{ path: "user/:id", element: <User.UserProfile />, public: false },
+		{ path: "user/edit/:id", element: <User.UserEditProfile />, public: false },
 
 		// Article page
 		{ path: "article", element: <Article.IndexArticle />, public: false },

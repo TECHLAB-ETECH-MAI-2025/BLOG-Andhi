@@ -1,4 +1,4 @@
-import { Badge, Button, Card, Col, Container, Row, Spinner, Stack } from "react-bootstrap";
+import { Badge, Button, Card, Col, Container, FloatingLabel, Form, Row, Spinner, Stack } from "react-bootstrap";
 import { AuthContext } from "../../config/AuthContext";
 import Navbar from "../../components/Navbar";
 import { Link, useNavigate, useParams } from "react-router";
@@ -11,8 +11,10 @@ import {
 	BsHeart,
 	BsHeartFill,
 	BsPencilSquare,
+	BsSend,
 	BsTrash,
 } from "react-icons/bs";
+import CommentItem from "../../components/CommentItem";
 
 function ShowArticle() {
 	const { token } = useContext(AuthContext);
@@ -32,12 +34,15 @@ function ShowArticle() {
 			id: new Number(),
 			name: new String(),
 		}),
+		comments: new Array(),
 	});
 
 	const [articleInfoState, setArticleInfoState] = useState({
 		like_count: 0,
 		comment_count: 0,
 	});
+
+	const [commentInput, setCommentInput] = useState("")
 
 	const handleClickLike = () => {};
 
@@ -60,6 +65,41 @@ function ShowArticle() {
 			});
 	};
 
+	const handleSubmitComment = (e) => {
+		e.preventDefault();
+
+		if (!commentInput.trim()) {
+			return;
+		}
+
+		API(token)("/comment/" + article.id + "/add", {
+			method: "POST",
+			body: {
+				content: commentInput.trim()
+			}
+		})
+			.then(res => {
+				if (!res.success) {
+					console.log(res.message);
+					return;
+				}
+				let newCommentList = article.comments;
+				newCommentList.push(res.data.comment);
+				setArticle((prevState) => ({
+					...prevState,
+					comments: newCommentList
+				}))
+				setArticleInfoState((prevState) => ({
+					...prevState,
+					comment_count: articleInfoState.comment_count++
+				}))
+				setCommentInput("");
+			})
+			.catch(err => {
+				console.error(err.message);
+			})
+	}
+
 	useEffect(() => {
 		API(token)("/article/" + id)
 			.then((res) => {
@@ -67,7 +107,8 @@ function ShowArticle() {
 					console.log(res.message);
 					return;
 				}
-				setArticle({
+				setArticle((prevState) => ({
+					...prevState,
 					id: res.data.article.id,
 					title: res.data.article.title,
 					content: res.data.article.content,
@@ -77,12 +118,37 @@ function ShowArticle() {
 						username: res.data.article.author_username,
 					},
 					categories: res.data.article.categories,
-				});
+				}));
+			})
+			.catch((err) => {
+				console.error(err.message);
+			});
+
+		API(token)("/comment/" + id)
+			.then((res) => {
+				if (!res.success) {
+					console.log(res.message);
+					return;
+				}
+				setArticle((prevState) => ({
+					...prevState,
+					comments: res.data.comments,
+				}));
 			})
 			.catch((err) => {
 				console.error(err.message);
 			});
 	}, []);
+
+	useEffect(() => {
+		if (article.comments) {
+			setArticleInfoState((prevState) => ({
+				...prevState,
+				comment_count: article.comments.length
+			}));
+		}
+	}, [article])
+	
 
 	return (
 		<>
@@ -132,7 +198,7 @@ function ShowArticle() {
 							) : (
 								<Spinner variant="primary" size={10} className="mx-auto my-5" />
 							)}
-							<Row direction="horizontal">
+							<Row>
 								<Col>
 									<Button
 										variant="light"
@@ -182,47 +248,31 @@ function ShowArticle() {
 					<hr />
 					<section>
 						<Stack className="my-2">
-							<h3>Comment ({articleInfoState.comment_count})</h3>
-							<div>
-								<div className="border-start border-4 border-primary rounded-2 px-3 py-1 bg-light">
-									<div className="d-flex align-items-center justify-content-between gap-2">
-										<Stack
-											direction="horizontal"
-											className="align-items-center gap-2"
-										>
-											<strong className="fs-5">
-												{article.author.username}
-											</strong>
-											<span>-</span>
-											<i className="text-muted">
-												{new Date().toLocaleDateString()}
-											</i>
-										</Stack>
-										<Stack direction="horizontal">
-											<Button
-												variant="light"
-												className="d-flex align-items-center justify-content-center gap-1 text-warning"
-											>
-												<BsPencilSquare />
-												<span>Edit</span>
-											</Button>
-											<Button
-												variant="light"
-												className="d-flex align-items-center justify-content-center gap-1 text-danger"
-											>
-												<BsTrash />
-												<span>Delete</span>
-											</Button>
-										</Stack>
-									</div>
-									<div>
-										Lorem ipsum, dolor sit amet consectetur adipisicing elit.
-										Nesciunt at quis commodi id, rerum nihil blanditiis optio,
-										quasi sapiente possimus a ad dolores, minima voluptatem quas
-										repellat. Distinctio, nostrum dolorum!
-									</div>
+							<Stack>
+								<Form className="d-flex align-items-start gap-2 my-2" onSubmit={handleSubmitComment}>
+									<Form.Control
+										as="textarea"
+										name="comment"
+										placeholder="Your comment here..."
+										className="rounded-4"
+										value={commentInput}
+										onChange={(e) => setCommentInput(e.target.value)}
+										required={true}
+									/>
+									<Button variant="primary" type="submit" className="rounded-circle d-flex align-items-center">
+										<BsSend size={30} className="mt-2" />
+									</Button>
+								</Form>
+								<div>
+									<h3>Comment{articleInfoState.comment_count > 1 ? "s" : ""} ({articleInfoState.comment_count})</h3>
 								</div>
-							</div>
+								<Stack gap={1}>
+									{article.comments &&
+										article.comments.map((comment, id) => {
+											return <CommentItem key={id} comment={comment} />;
+										})}
+								</Stack>
+							</Stack>
 						</Stack>
 					</section>
 				</Container>

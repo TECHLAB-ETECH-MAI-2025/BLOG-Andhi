@@ -84,7 +84,7 @@ function UserProfile() {
                                     </>
                                     :
                                     <>
-                                        <Button variant="info" onClick={() => navigate("/article/new")}>Edit profile</Button>
+                                        <Button variant="info" onClick={() => navigate("/user/edit/" + user.id)}>Edit profile</Button>
                                         <Button variant="primary" onClick={() => navigate("/article/new")}>Create an article</Button>
                                     </>
 								}

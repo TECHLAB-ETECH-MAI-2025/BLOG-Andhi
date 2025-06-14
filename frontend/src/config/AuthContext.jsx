@@ -36,6 +36,10 @@ const verifyToken = (token) => {
 		return null;
 	}
 	let payload = token.split(".");
+	if (!payload) {
+		return null;
+	}
+
 	return {
 		user: JSON.parse(atob(payload[0])),
 		isExpired: JSON.parse(atob(payload[1])).expDate > Date.now() + 1000,
